@@ -10,6 +10,9 @@ import { Moon3D } from './components/Moon/Moon3D'
 import { Hero } from './components/Hero/Hero'
 import { About } from './components/About/About'
 import { Team } from './components/Team/Team'
+import { Projects } from './components/Projects/Projects'
+import { CompletedProjects } from './components/Projects/CompletedProjects'
+import { Footer } from './components/Footer/Footer'
 import { Header } from './components/Header/Header'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -18,6 +21,7 @@ function App() {
   const containerRef = useRef(null)
   const moonRef = useRef(null)
   const gapRef = useRef(null)
+  const spotlightRef = useRef(null)
   const [moonReady, setMoonReady] = useState(false)
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight })
 
@@ -43,15 +47,15 @@ function App() {
     }
 
     // Ensure initial state
-    gsap.set(moonRef.current.position, { 
-      x: startX, 
-      y: 0, 
-      z: 0 
+    gsap.set(moonRef.current.position, {
+      x: startX,
+      y: 0,
+      z: 0
     })
-    gsap.set(moonRef.current.scale, { 
-      x: window.innerWidth < 1024 ? 0.65 : 0.6, 
-      y: window.innerWidth < 1024 ? 0.65 : 0.6, 
-      z: window.innerWidth < 1024 ? 0.65 : 0.6 
+    gsap.set(moonRef.current.scale, {
+      x: window.innerWidth < 1024 ? 0.65 : 0.6,
+      y: window.innerWidth < 1024 ? 0.65 : 0.6,
+      z: window.innerWidth < 1024 ? 0.65 : 0.6
     })
 
     const tl = gsap.timeline({
@@ -71,9 +75,9 @@ function App() {
       duration: 1,
       ease: 'power2.inOut'
     }, 0)
-    
+
     const targetScale = window.innerWidth < 768 ? 1.1 : window.innerWidth < 1024 ? 1.4 : 1.8
-    
+
     tl.to(moonRef.current.scale, {
       x: targetScale,
       y: targetScale,
@@ -81,7 +85,7 @@ function App() {
       duration: 1,
       ease: 'power2.inOut'
     }, 0)
-    
+
     tl.to(moonRef.current.rotation, {
       y: Math.PI * 1.5,
       x: Math.PI * 0.2,
@@ -89,13 +93,29 @@ function App() {
       ease: 'none'
     }, 0)
 
-    // Fade in tooltip
-    tl.to('.about-tooltip', {
-      autoAlpha: 1,
-      x: 0,
-      duration: 0.3,
-      ease: 'power2.out'
-    }, 0.5)
+    // Removed About tooltip fade in
+
+    // === SATELLITE SPOTLIGHT: Focus on About section ===
+    if (spotlightRef.current?.light) {
+      const light = spotlightRef.current.light
+      const target = spotlightRef.current.target
+
+      // Spotlight powers on and aims toward About tooltip (right side)
+      tl.to(light, {
+        intensity: 8,
+        angle: 0.5,
+        duration: 0.4,
+        ease: 'power2.in'
+      }, 0.4)
+
+      tl.to(target.position, {
+        x: 4,
+        y: 1,
+        z: 3,
+        duration: 0.5,
+        ease: 'power2.inOut'
+      }, 0.4)
+    }
 
     // Phase 2: Scroll to Team section (rotate moon more, stay in place)
     tl.to(moonRef.current.rotation, {
@@ -104,26 +124,67 @@ function App() {
       duration: 1,
       ease: 'power1.inOut'
     }, 1)
-    
-    tl.to('.about-tooltip', {
-      autoAlpha: 0,
-      x: -12,
-      duration: 0.2
-    }, 1.0)
 
-    tl.to('.team-tooltip', {
-      autoAlpha: 1,
-      x: 0,
-      duration: 0.3,
-      ease: 'power2.out'
-    }, 1.2)
+    // Removed About tooltip fade out
+
+    // === SATELLITE SPOTLIGHT: Sweep to Team section ===
+    if (spotlightRef.current?.light) {
+      const light = spotlightRef.current.light
+      const target = spotlightRef.current.target
+
+      // Spotlight sweeps down to Team tooltip
+      tl.to(light, {
+        intensity: 12,
+        angle: 0.6,
+        duration: 0.4,
+        ease: 'power2.inOut'
+      }, 1.1)
+
+      tl.to(target.position, {
+        x: 4,
+        y: -1,
+        z: 3,
+        duration: 0.5,
+        ease: 'power2.inOut'
+      }, 1.1)
+    }
+
+    // Phase 3: Scroll to Projects section (rotate moon further)
+    tl.to(moonRef.current.rotation, {
+      y: Math.PI * 4.5,
+      x: Math.PI * 0.2,
+      duration: 1,
+      ease: 'power1.inOut'
+    }, 2)
+
+    // === SATELLITE SPOTLIGHT: Sweep to Projects section ===
+    if (spotlightRef.current?.light) {
+      const light = spotlightRef.current.light
+      const target = spotlightRef.current.target
+
+      // Spotlight sweeps to highlight from a different angle
+      tl.to(light, {
+        intensity: 8,
+        angle: 0.8,
+        duration: 0.4,
+        ease: 'power2.inOut'
+      }, 2.1)
+
+      tl.to(target.position, {
+        x: -4,
+        y: 1,
+        z: 3,
+        duration: 0.5,
+        ease: 'power2.inOut'
+      }, 2.1)
+    }
 
   }, { scope: containerRef, dependencies: [moonReady, windowSize.width] })
 
   return (
     <LenisWrapper>
       <div ref={containerRef} className="relative w-full text-moon-white bg-moon-black min-h-screen">
-        
+
         {/* Fixed 3D Canvas Layer */}
         <div className="fixed inset-0 z-0 pointer-events-none">
           <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
@@ -131,10 +192,12 @@ function App() {
             <directionalLight position={[10, 0, 2]} intensity={4} color="#ffffff" />
             {/* Starry Background */}
             <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-            
-            <Moon3D moonRef={moonRef} onReady={() => setMoonReady(true)} />
+
+            <Moon3D moonRef={moonRef} onReady={() => setMoonReady(true)} spotlightRef={spotlightRef} />
           </Canvas>
         </div>
+
+        {/* Tooltips removed as content is displayed inline */}
 
         {/* HTML Content Overlay */}
         <div className="relative z-10 w-full flex flex-col">
@@ -142,6 +205,9 @@ function App() {
           <Hero gapRef={gapRef} />
           <About />
           <Team />
+          <Projects />
+          <CompletedProjects />
+          <Footer />
         </div>
 
       </div>

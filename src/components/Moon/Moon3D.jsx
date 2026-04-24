@@ -1,14 +1,20 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useMemo } from 'react'
 import { useLoader, useFrame } from '@react-three/fiber'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
+import * as THREE from 'three'
 
-export const Moon3D = ({ moonRef, onReady }) => {
+export const Moon3D = ({ moonRef, onReady, spotlightRef }) => {
   const [colorMap, displacementMap] = useLoader(TextureLoader, [
     '/moon-texture.jpg',
     '/moon-displacement.jpg'
   ])
 
   const orbitRef = useRef()
+  const internalSpotRef = useRef()
+  const spotTargetRef = useRef()
+
+  // Create a target object for the spotlight to track
+  const spotTarget = useMemo(() => new THREE.Object3D(), [])
 
   // Make the satellite orbit independently
   useFrame((state, delta) => {
@@ -24,6 +30,16 @@ export const Moon3D = ({ moonRef, onReady }) => {
     }
   }, [moonRef, onReady])
 
+  // Expose the spotlight ref to parent
+  useEffect(() => {
+    if (spotlightRef) {
+      spotlightRef.current = {
+        light: internalSpotRef.current,
+        target: spotTarget
+      }
+    }
+  }, [spotlightRef, spotTarget])
+
   return (
     <group ref={moonRef}>
       <mesh castShadow receiveShadow>
@@ -37,6 +53,9 @@ export const Moon3D = ({ moonRef, onReady }) => {
           metalness={0.1}
         />
       </mesh>
+
+      {/* Spotlight target - positioned where the beam should aim */}
+      <primitive object={spotTarget} position={[-3, 0, 2]} />
 
       {/* Orbiting Satellite */}
       <group ref={orbitRef}>
@@ -119,6 +138,26 @@ export const Moon3D = ({ moonRef, onReady }) => {
           <mesh position={[0.04, 0.04, 0.04]}>
             <sphereGeometry args={[0.005, 8, 8]} />
             <meshBasicMaterial color="#ff3333" />
+          </mesh>
+
+          {/* Satellite Spotlight Beam */}
+          <spotLight
+            ref={internalSpotRef}
+            position={[0, 0, 0]}
+            target={spotTarget}
+            color="#88ccff"
+            intensity={0}
+            angle={0.4}
+            penumbra={0.6}
+            distance={12}
+            decay={1.5}
+            castShadow={false}
+          />
+
+          {/* Spotlight emitter lens glow */}
+          <mesh position={[-0.06, 0, 0]}>
+            <sphereGeometry args={[0.012, 8, 8]} />
+            <meshBasicMaterial color="#88ccff" transparent opacity={0} className="sat-lens-glow" />
           </mesh>
           
         </group>

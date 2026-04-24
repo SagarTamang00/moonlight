@@ -89,7 +89,7 @@ export const Hero = ({ gapRef }) => {
     <section className="relative h-[100dvh] md:h-screen w-full flex items-center justify-center overflow-hidden">
       <div className="relative z-10 flex items-center justify-center text-[20vw] sm:text-[18vw] md:text-[15vw] font-cinematic leading-none select-none pointer-events-none">
         <span
-          className="text-transparent tracking-[0.1em] sm:tracking-[0.12em] md:tracking-[0.15em]"
+          className="text-white tracking-[0.1em] sm:tracking-[0.12em] md:tracking-[0.15em]"
           style={{ WebkitTextStroke: 'calc(1px + 0.1vw) white' }}
         >
           M
@@ -99,7 +99,7 @@ export const Hero = ({ gapRef }) => {
         <span ref={gapRef} className="inline-block w-[16vw] sm:w-[14vw] md:w-[12vw]"></span>
         
         <span
-          className="text-transparent tracking-[0.1em] sm:tracking-[0.12em] md:tracking-[0.15em]"
+          className="text-white tracking-[0.1em] sm:tracking-[0.12em] md:tracking-[0.15em]"
           style={{ WebkitTextStroke: 'calc(1px + 0.1vw) white' }}
         >
           ONL
@@ -139,7 +139,7 @@ export const Hero = ({ gapRef }) => {
 
           {/* Letter I without tracking, so the container fits it perfectly */}
           <span
-            className="text-transparent"
+            className="text-white"
             style={{ WebkitTextStroke: 'calc(1px + 0.1vw) white' }}
           >
             I
@@ -147,7 +147,7 @@ export const Hero = ({ gapRef }) => {
         </span>
 
         <span
-          className="text-transparent tracking-[0.1em] sm:tracking-[0.12em] md:tracking-[0.15em]"
+          className="text-white tracking-[0.1em] sm:tracking-[0.12em] md:tracking-[0.15em]"
           style={{ WebkitTextStroke: 'calc(1px + 0.1vw) white' }}
         >
           GHT
