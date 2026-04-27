@@ -14,6 +14,8 @@ import { Projects } from './components/Projects/Projects'
 import { CompletedProjects } from './components/Projects/CompletedProjects'
 import { Footer } from './components/Footer/Footer'
 import { Header } from './components/Header/Header'
+import { Routes, Route } from 'react-router-dom'
+import { AllProjectsPage } from './pages/AllProjectsPage'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -183,34 +185,37 @@ function App() {
 
   return (
     <LenisWrapper>
-      <div ref={containerRef} className="relative w-full text-moon-white bg-moon-black min-h-screen">
+      <Routes>
+        <Route path="/" element={
+          <div ref={containerRef} className="relative w-full text-moon-white bg-moon-black min-h-screen">
 
-        {/* Fixed 3D Canvas Layer */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-            <ambientLight intensity={0.01} />
-            <directionalLight position={[10, 0, 2]} intensity={4} color="#ffffff" />
-            {/* Starry Background */}
-            <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
+            {/* Fixed 3D Canvas Layer */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+              <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+                <ambientLight intensity={0.01} />
+                <directionalLight position={[10, 0, 2]} intensity={4} color="#ffffff" />
+                {/* Starry Background */}
+                <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
 
-            <Moon3D moonRef={moonRef} onReady={() => setMoonReady(true)} spotlightRef={spotlightRef} />
-          </Canvas>
-        </div>
+                <Moon3D moonRef={moonRef} onReady={() => setMoonReady(true)} spotlightRef={spotlightRef} />
+              </Canvas>
+            </div>
 
-        {/* Tooltips removed as content is displayed inline */}
+            {/* HTML Content Overlay */}
+            <div className="relative z-10 w-full flex flex-col">
+              <Header />
+              <Hero gapRef={gapRef} />
+              <About />
+              <Team />
+              <Projects />
+              <CompletedProjects />
+              <Footer />
+            </div>
 
-        {/* HTML Content Overlay */}
-        <div className="relative z-10 w-full flex flex-col">
-          <Header />
-          <Hero gapRef={gapRef} />
-          <About />
-          <Team />
-          <Projects />
-          <CompletedProjects />
-          <Footer />
-        </div>
-
-      </div>
+          </div>
+        } />
+        <Route path="/all-projects" element={<AllProjectsPage />} />
+      </Routes>
     </LenisWrapper>
   )
 }

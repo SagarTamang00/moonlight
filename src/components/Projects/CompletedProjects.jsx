@@ -1,74 +1,32 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import { Link } from 'react-router-dom'
+import { releasedProjects } from './projectsData'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return '';
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11)
+    ? `https://www.youtube.com/embed/${match[2]}?autoplay=1&rel=0`
+    : url;
+};
 
 export const CompletedProjects = () => {
   const sectionRef = useRef(null)
   const [activeVideo, setActiveVideo] = useState(null)
   const [expandedProject, setExpandedProject] = useState(null)
+  const [isPlaying, setIsPlaying] = useState(false)
 
-  const releasedProjects = [
-    {
-      id: 1,
-      index: '01',
-      title: 'LUNAR ECHOES',
-      releaseYear: '2025',
-      awards: 'Winner — Best Visual Effects',
-      genre: 'Sci-Fi Feature',
-      runtime: '2h 14m',
-      description:
-        'A breathtaking journey into the silent voids of space, exploring the profound isolation and sheer beauty of the lunar surface. It redefined cinematic immersion with revolutionary practical effects blended with state-of-the-art CGI.',
-      coverImage:
-        'https://images.unsplash.com/photo-1541873676-a18131494184?q=80&w=1918&auto=format&fit=crop',
-      videos: [
-        { id: 'v1a', label: 'Official Trailer', duration: '2:34', thumb: 'https://images.unsplash.com/photo-1509773896068-7fd415d91e2e?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v1b', label: 'Teaser Cut', duration: '1:02', thumb: 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v1c', label: 'Behind the Lens', duration: '8:17', thumb: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v1d', label: 'VFX Breakdown', duration: '5:49', thumb: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop' },
-      ],
-    },
-    {
-      id: 2,
-      index: '02',
-      title: 'NEON SYNDICATE',
-      releaseYear: '2024',
-      awards: 'Nominee — Outstanding Series',
-      genre: 'Cyberpunk Mini-Series',
-      runtime: '6 Episodes',
-      description:
-        'Set in a dystopian metropolis illuminated only by synthetic neon glow, it follows the intertwined lives of outcasts fighting against a megacorporation\'s total control. Praised for its intense pacing and phenomenal score.',
-      coverImage:
-        'https://images.unsplash.com/photo-1555861496-faa66bfcb368?q=80&w=2070&auto=format&fit=crop',
-      videos: [
-        { id: 'v2a', label: 'Series Trailer', duration: '3:11', thumb: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v2b', label: 'Episode 1 Clip', duration: '4:22', thumb: 'https://images.unsplash.com/photo-1523821741446-edb2b68bb7a0?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v2c', label: 'Score Featurette', duration: '6:58', thumb: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=600&auto=format&fit=crop' },
-      ],
-    },
-    {
-      id: 3,
-      index: '03',
-      title: 'THE ABYSS',
-      releaseYear: '2023',
-      awards: 'Winner — Best Sound Design',
-      genre: 'Psychological Horror',
-      runtime: '1h 58m',
-      description:
-        'A terrifying descent into the deepest parts of the ocean. Utilizing groundbreaking underwater cinematography and a highly immersive, claustrophobic soundscape that kept audiences on the edge of their seats.',
-      coverImage:
-        'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?q=80&w=2070&auto=format&fit=crop',
-      videos: [
-        { id: 'v3a', label: 'Main Trailer', duration: '2:48', thumb: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v3b', label: 'Director\'s Cut Promo', duration: '1:33', thumb: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v3c', label: 'Sound Design Reel', duration: '7:05', thumb: 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v3d', label: 'Cast Interviews', duration: '12:44', thumb: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop' },
-        { id: 'v3e', label: 'Underwater BTS', duration: '9:20', thumb: 'https://images.unsplash.com/photo-1551244072-5d12893278bc?q=80&w=600&auto=format&fit=crop' },
-      ],
-    },
-  ]
+  useEffect(() => {
+    setIsPlaying(false)
+  }, [activeVideo])
+
+
 
   useGSAP(() => {
     gsap.fromTo('.cp-headline', { opacity: 0, y: 40 }, {
@@ -104,7 +62,6 @@ export const CompletedProjects = () => {
         {/* Section header */}
         <div className="cp-headline mb-20 lg:mb-32 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-white/10 pb-10">
           <div>
-            <p className="text-xs tracking-[0.35em] uppercase text-white/40 mb-4 font-mono">Selected Works</p>
             <h2
               className="text-5xl sm:text-6xl lg:text-8xl font-cinematic text-white leading-none"
               style={{ textShadow: '0 0 60px rgba(255,255,255,0.08)' }}
@@ -113,14 +70,23 @@ export const CompletedProjects = () => {
               <span className="text-white/20">WORKS</span>
             </h2>
           </div>
-          <p className="text-sm text-white/30 max-w-xs text-right font-light tracking-wide hidden sm:block">
-            Award-winning films &amp; series crafted with uncompromising vision.
-          </p>
+          <div className="flex justify-end">
+            <Link 
+              to="/all-projects" 
+              className="group relative px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-white text-xs tracking-[0.2em] uppercase transition-all duration-300 overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                View All Projects
+                <span className="text-base group-hover:translate-x-1 transition-transform duration-300">→</span>
+              </span>
+              <div className="absolute inset-0 w-full h-full bg-white/10 scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out"></div>
+            </Link>
+          </div>
         </div>
 
         {/* Project rows */}
         <div className="flex flex-col divide-y divide-white/[0.07]">
-          {releasedProjects.map((project) => {
+          {releasedProjects.slice(0, 4).map((project) => {
             const isExpanded = expandedProject === project.id
 
             return (
@@ -132,20 +98,27 @@ export const CompletedProjects = () => {
                   onClick={() => toggleExpand(project.id)}
                 >
                   {/* Index */}
-                  <span className="font-mono text-xs text-white/20 w-8 shrink-0 hidden lg:block">
+                  <span className="text-xs text-white/20 w-8 shrink-0 hidden lg:block">
                     {project.index}
                   </span>
 
                   {/* Thumbnail strip */}
-                  <div className="relative w-full lg:w-64 xl:w-80 aspect-[16/9] shrink-0 overflow-hidden">
+                  <div className="relative w-full lg:w-64 xl:w-80 aspect-[16/9] shrink-0 overflow-hidden bg-black/20">
+                    {/* Blurred background to fill empty space without black bars */}
+                    <img
+                      src={project.coverImage}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 grayscale group-hover:grayscale-0 transition-all duration-700 scale-110"
+                    />
+                    {/* Actual uncut poster */}
                     <img
                       src={project.coverImage}
                       alt={project.title}
-                      className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                      className="absolute inset-0 w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-700 scale-95 group-hover:scale-100"
                     />
-                    <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors duration-500" />
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500" />
                     <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
-                    <span className="absolute bottom-3 left-4 font-mono text-[10px] text-white/50 tracking-widest">
+                    <span className="absolute bottom-3 left-4 text-[10px] text-white/70 tracking-widest font-semibold drop-shadow-md z-10">
                       {project.videos.length} VIDEOS
                     </span>
                   </div>
@@ -153,25 +126,25 @@ export const CompletedProjects = () => {
                   {/* Meta */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-[10px] font-mono text-white/30 tracking-[0.25em] uppercase">{project.releaseYear}</span>
+                      <span className="text-[10px] text-white/30 tracking-[0.25em] uppercase">{project.releaseYear}</span>
                       <span className="w-px h-3 bg-white/20" />
-                      <span className="text-[10px] font-mono text-white/30 tracking-[0.2em] uppercase">{project.genre}</span>
+                      <span className="text-[10px] text-white/30 tracking-[0.2em] uppercase">{project.genre}</span>
                       <span className="w-px h-3 bg-white/20" />
-                      <span className="text-[10px] font-mono text-white/30 tracking-[0.2em] uppercase">{project.runtime}</span>
+                      <span className="text-[10px] text-white/30 tracking-[0.2em] uppercase">{project.runtime}</span>
                     </div>
 
                     <h3 className="text-3xl sm:text-4xl lg:text-5xl font-cinematic text-white leading-none mb-4 group-hover:text-white/90 transition-colors">
                       {project.title}
                     </h3>
 
-                    <p className="text-sm text-white/30 tracking-[0.15em] uppercase font-mono">
+                    <p className="text-sm text-white/30 tracking-[0.15em] uppercase">
                       {project.awards}
                     </p>
                   </div>
 
                   {/* Expand toggle */}
                   <div className="hidden lg:flex items-center gap-3 shrink-0">
-                    <span className="text-xs text-white/30 tracking-widest uppercase font-mono">
+                    <span className="text-xs text-white/30 tracking-widest uppercase">
                       {isExpanded ? 'Close' : 'View All'}
                     </span>
                     <div className={`w-8 h-8 rounded-full border border-white/20 flex items-center justify-center transition-all duration-500 ${isExpanded ? 'rotate-45 bg-white/10' : 'group-hover:border-white/50'}`}>
@@ -196,7 +169,7 @@ export const CompletedProjects = () => {
                     </p>
 
                     {/* Video label */}
-                    <p className="text-[10px] tracking-[0.35em] uppercase font-mono text-white/25">
+                    <p className="text-[10px] tracking-[0.35em] uppercase text-white/25">
                       — AVAILABLE FOOTAGE
                     </p>
 
@@ -230,8 +203,8 @@ export const CompletedProjects = () => {
 
                             {/* Label + duration */}
                             <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-                              <p className="text-[10px] font-mono text-white/80 leading-tight truncate">{video.label}</p>
-                              <p className="text-[9px] font-mono text-white/35 mt-0.5">{video.duration}</p>
+                              <p className="text-[10px] text-white/80 leading-tight truncate">{video.label}</p>
+                              <p className="text-[9px] text-white/35 mt-0.5">{video.duration}</p>
                             </div>
                           </button>
                         )
@@ -239,31 +212,76 @@ export const CompletedProjects = () => {
                     </div>
 
                     {/* Active video player placeholder */}
-                    {activeVideo && (
-                      <div className="relative w-full aspect-video bg-black/60 flex items-center justify-center border border-white/10">
-                        <div className="text-center">
-                          <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-6 h-6 text-white/40 ml-1" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" />
-                            </svg>
-                          </div>
-                          <p className="text-white/30 font-mono text-xs tracking-widest uppercase">
-                            {project.videos.find(v => v.id === activeVideo)?.label}
-                          </p>
-                          <p className="text-white/15 font-mono text-[10px] mt-1 tracking-wider">PLAYER EMBED AREA</p>
-                        </div>
+                    {activeVideo && (() => {
+                      const videoData = project.videos.find(v => v.id === activeVideo)
+                      return (
+                        <div className="relative w-full aspect-video bg-black/60 flex items-center justify-center border border-white/10 overflow-hidden">
 
-                        {/* Close */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setActiveVideo(null) }}
-                          className="absolute top-4 right-4 w-7 h-7 rounded-full border border-white/20 flex items-center justify-center text-white/40 hover:text-white hover:border-white/50 transition-colors"
-                        >
-                          <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <line x1="1" y1="1" x2="11" y2="11" /><line x1="11" y1="1" x2="1" y2="11" />
-                          </svg>
-                        </button>
-                      </div>
-                    )}
+                          {isPlaying && videoData?.youtubeLink ? (
+                            <div className="absolute inset-6 md:inset-12 lg:inset-16 z-10 bg-black rounded-lg overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-white/10">
+                              <iframe
+                                className="w-full h-full"
+                                src={getYouTubeEmbedUrl(videoData.youtubeLink)}
+                                title={videoData.label}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              ></iframe>
+                            </div>
+                          ) : (
+                            <>
+                              {/* Background Thumbnail */}
+                              {videoData?.thumb && (
+                                <>
+                                  <img
+                                    src={videoData.thumb}
+                                    alt={videoData.label}
+                                    className="absolute inset-0 w-full h-full object-cover opacity-60"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40" />
+                                </>
+                              )}
+
+                              <div className="relative z-10 text-center">
+                                <div
+                                  onClick={(e) => { e.stopPropagation(); setIsPlaying(true) }}
+                                  className="w-16 h-16 rounded-full border border-white/20 bg-black/50 backdrop-blur-sm flex items-center justify-center mx-auto mb-4 hover:bg-white/10 transition-colors cursor-pointer"
+                                >
+                                  <svg className="w-6 h-6 text-white ml-1" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" />
+                                  </svg>
+                                </div>
+                                <p className="text-white text-sm tracking-widest uppercase mb-6 font-semibold drop-shadow-md">
+                                  {videoData?.label}
+                                </p>
+                                {videoData?.youtubeLink ? (
+                                  <a
+                                    href={videoData.youtubeLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-block px-6 py-2.5 border border-white/40 bg-black/50 hover:bg-white/20 backdrop-blur-sm text-white text-[10px] tracking-widest uppercase transition-colors"
+                                  >
+                                    Watch on YouTube
+                                  </a>
+                                ) : (
+                                  <p className="text-white/40 text-[10px] tracking-wider bg-black/50 px-4 py-2 inline-block rounded">PLAYER EMBED AREA</p>
+                                )}
+                              </div>
+                            </>
+                          )}
+
+                          {/* Close */}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setActiveVideo(null); setIsPlaying(false) }}
+                            className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full border border-white/20 bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:border-white/50 transition-colors"
+                          >
+                            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <line x1="1" y1="1" x2="11" y2="11" /><line x1="11" y1="1" x2="1" y2="11" />
+                            </svg>
+                          </button>
+                        </div>
+                      )
+                    })()}
 
                   </div>
                 </div>

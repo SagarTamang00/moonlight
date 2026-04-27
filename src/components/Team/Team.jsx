@@ -44,25 +44,25 @@ export const Team = () => {
 
   const teamMembers = [
     {
-      name: 'Elena Rostova',
-      role: 'Creative Director',
-      image: '/team_elena.png',
+      name: 'Santosh Bhandari',
+      role: 'CEO',
+      image: '/santosh.jpeg',
     },
     {
-      name: 'Marcus Chen',
-      role: 'VFX Supervisor',
-      image: '/team_marcus.png',
+      name: 'Thaman Kumar Bhandari',
+      role: 'Executive Producer',
+      image: '/thaman.jpeg',
     },
-    {
-      name: 'Sarah Jenkins',
-      role: 'Lead Animator',
-      image: '/team_sarah.png',
-    },
-    {
-      name: 'David Kim',
-      role: 'Technical Artist',
-      image: '/team_david.png',
-    },
+    // {
+    //   name: 'Sarah Jenkins',
+    //   role: 'Lead Animator',
+    //   image: '/team_sarah.png',
+    // },
+    // {
+    //   name: 'David Kim',
+    //   role: 'Technical Artist',
+    //   image: '/team_david.png',
+    // },
   ]
 
   return (
@@ -79,7 +79,6 @@ export const Team = () => {
         <div className="w-full overflow-hidden opacity-0 team-carousel translate-y-8">
           <div
             ref={emblaRef}
-            data-lenis-prevent="true"
             className="w-full overflow-hidden"
           >
             <div className="flex gap-6 sm:gap-8 lg:gap-10 cursor-grab active:cursor-grabbing touch-pan-y">

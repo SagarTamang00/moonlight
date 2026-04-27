@@ -5,6 +5,7 @@ export const AuditionModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
       if (window.lenis) window.lenis.stop()
       
       gsap.to('.modal-overlay', { opacity: 1, duration: 0.3, display: 'block', ease: 'power2.out' })
@@ -14,6 +15,7 @@ export const AuditionModal = ({ isOpen, onClose }) => {
       )
     } else {
       document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
       if (window.lenis) window.lenis.start()
       
       gsap.to('.modal-content', { y: 20, opacity: 0, duration: 0.2, ease: 'power2.in' })
@@ -22,6 +24,7 @@ export const AuditionModal = ({ isOpen, onClose }) => {
 
     return () => {
       document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
       if (window.lenis) window.lenis.start()
     }
   }, [isOpen])
