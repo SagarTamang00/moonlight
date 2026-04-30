@@ -55,7 +55,7 @@ export const Header = () => {
           onClick={() => setIsModalOpen(true)}
           className="border border-white/30 hover:border-white px-5 py-2 md:px-6 md:py-2 rounded-full text-white text-xs md:text-sm font-medium tracking-widest uppercase transition-all duration-300 hover:bg-white hover:text-black pointer-events-auto"
         >
-          Apply for Audition
+          For Collaboration
         </button>
       </header>
 

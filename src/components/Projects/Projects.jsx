@@ -21,7 +21,26 @@ export const ALL_PROJECTS = [
     description: 'A legal-themed political talk show hosted by Tikaram Yatri and judged by Mithila Sharma. The program brings public figures into a courtroom dock to answer for their actions under the theme.',
     image: '/kadhgara.jpeg',
     network: 'Himalaya TV',
-    digital_partner: 'OSR Reality'
+    digital_partner: 'OSR Reality',
+    seasons: [
+      {
+        seasonNumber: 1,
+        seasonTitle: 'Season 1',
+        playlistLink: 'https://youtube.com/playlist?list=PL...',
+        episodes: [
+          { id: 'k1e1', label: 'Episode 1: The Verdict', duration: '45:12', thumb: '/kadhgara.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+          { id: 'k1e2', label: 'Episode 2: Cross Examination', duration: '42:30', thumb: '/kadhgara.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+        ]
+      },
+      {
+        seasonNumber: 2,
+        seasonTitle: 'Season 2 (Upcoming)',
+        playlistLink: 'https://youtube.com/playlist?list=PL...',
+        episodes: [
+          { id: 'k2e1', label: 'Season 2 Teaser', duration: '1:30', thumb: '/kadhgara.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+        ]
+      }
+    ]
   },
   {
     id: 2,
@@ -32,16 +51,29 @@ export const ALL_PROJECTS = [
     description: 'A soulful Nepali-style podcast hosted by Avas Karmacharya, where meaningful conversations unfold in the heart of nature. Seated traditionally on a mat with chiya beside them, guests share stories, life experiences, ideas, and wisdom in a peaceful open-air setting.',
     image: '/nep.jpeg',
     network: 'Moonlight Motion Picture',
-    digital_partner: 'Moonlight Originals'
+    digital_partner: 'Moonlight Originals',
+    seasons: [
+      {
+        seasonNumber: 1,
+        seasonTitle: 'Volume 1',
+        playlistLink: 'https://youtube.com/playlist?list=PL...',
+        episodes: [
+          { id: 'sg1e1', label: 'Episode 1: Roots', duration: '55:00', thumb: '/nep.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+        ]
+      }
+    ]
   },
   {
     id: 3,
-    title: 'Eclipse',
-    category: 'Psychological Thriller',
+    title: 'Cine Sarga',
+    category: 'Podcast',
     status: 'Upcoming',
-    release: 'Winter 2027',
+    release: '2026',
     description: 'When the moon goes dark, so do the minds of the citizens. A gripping thriller that explores the boundaries of human consciousness.',
-    image: 'https://images.unsplash.com/photo-1532767153582-b1a0e5145009?q=80&w=1974&auto=format&fit=crop',
+    image: '/pod.jpeg',
+    videos: [
+      { id: 'e1', label: 'Offical', duration: '1:15', thumb: 'https://images.unsplash.com/photo-1532767153582-b1a0e5145009?q=80&w=1974&auto=format&fit=crop', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
+    ]
   },
   {
     id: 4,
@@ -51,6 +83,9 @@ export const ALL_PROJECTS = [
     release: 'Spring 2027',
     description: 'A beautifully animated journey of a young star trying to find its place in the cosmos. Perfect for audiences of all ages.',
     image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2044&auto=format&fit=crop',
+    videos: [
+      { id: 's1', label: 'Animation Sneak Peek', duration: '2:40', thumb: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2044&auto=format&fit=crop', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
+    ]
   }
 ]
 
@@ -63,24 +98,30 @@ export const ProjectCard = ({ project, onClick, animClass = '' }) => (
     onClick={() => onClick(project)}
     className={`${animClass} group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 aspect-[4/5] cursor-pointer hover:border-white/30 transition-all duration-500`}
   >
-    <img
-      src={project.image}
-      alt={project.title}
-      className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-60 group-hover:opacity-90 grayscale group-hover:grayscale-0"
-    />
-    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+    <div className="absolute inset-0 w-full h-full bg-black">
+      <div
+        className="absolute inset-0 bg-cover bg-center blur-xl opacity-40 scale-125 transition-transform duration-1000 group-hover:scale-150"
+        style={{ backgroundImage: `url(${project.image})` }}
+      />
+      <img
+        src={project.image}
+        alt={project.title}
+        className="relative w-full h-full object-contain transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100 grayscale group-hover:grayscale-0 z-10"
+      />
+    </div>
+    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500 z-20" />
 
     {/* Status badge */}
-    <div className="absolute top-4 right-4">
+    <div className="absolute top-4 right-4 z-30">
       <span className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${project.status === 'Ongoing'
-          ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-          : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
+        ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
+        : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
         }`}>
         {project.status}
       </span>
     </div>
 
-    <div className="absolute inset-0 p-6 lg:p-8 flex flex-col justify-end">
+    <div className="absolute inset-0 p-6 lg:p-8 flex flex-col justify-end z-30">
       <span className="text-gray-400 text-xs lg:text-sm tracking-[0.2em] uppercase mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
         {project.category}
       </span>
@@ -135,13 +176,19 @@ export const ProjectModal = ({ project, onClose }) => {
 
           <div className="flex flex-col lg:flex-row h-auto lg:min-h-[60vh]">
             <div className="w-full lg:w-1/2 h-48 sm:h-64 lg:h-auto relative overflow-hidden shrink-0">
-              <img src={project.image} alt={project.title} className="absolute inset-0 w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/80 hidden lg:block" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent lg:hidden" />
-              <div className="absolute top-4 left-4">
+              <div className="absolute inset-0 w-full h-full bg-black">
+                <div
+                  className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-125"
+                  style={{ backgroundImage: `url(${project.image})` }}
+                />
+                <img src={project.image} alt={project.title} className="relative w-full h-full object-contain z-10" />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/80 hidden lg:block z-20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent lg:hidden z-20" />
+              <div className="absolute top-4 left-4 z-30">
                 <span className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${project.status === 'Ongoing'
-                    ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-                    : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
+                  ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
+                  : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
                   }`}>{project.status}</span>
               </div>
             </div>
@@ -164,10 +211,10 @@ export const ProjectModal = ({ project, onClose }) => {
               <p className="text-sm sm:text-base lg:text-lg font-light leading-relaxed text-gray-300 mb-8 sm:mb-10">
                 {project.description}
               </p>
-              <button className="self-start relative overflow-hidden group px-6 py-3 sm:px-8 sm:py-4 border border-white/30 rounded-full text-white text-xs sm:text-sm font-medium tracking-widest uppercase transition-all duration-300">
+              {/* <button className="self-start relative overflow-hidden group px-6 py-3 sm:px-8 sm:py-4 border border-white/30 rounded-full text-white text-xs sm:text-sm font-medium tracking-widest uppercase transition-all duration-300">
                 <span className="relative z-10 group-hover:text-black transition-colors duration-300">Register Interest</span>
                 <div className="absolute inset-0 w-full h-full bg-white scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out" />
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -217,9 +264,9 @@ export const Projects = ({ onNavigateToAll }) => {
 
         {/* See More — navigates to /projects page */}
         <div className="mt-14 flex flex-col items-center gap-3">
-          <button
-            onClick={onNavigateToAll}
-            className="relative overflow-hidden group px-12 py-4 border border-white/30 rounded-full text-white text-xs font-medium tracking-[0.25em] uppercase transition-all duration-300 hover:border-white"
+          <a
+            href="/upcoming-projects"
+            className="relative overflow-hidden group px-12 py-4 border border-white/30 rounded-full text-white text-xs font-medium tracking-[0.25em] uppercase transition-all duration-300 hover:border-white inline-block"
           >
             <span className="relative z-10 group-hover:text-black transition-colors duration-300 flex items-center gap-3">
               See All Projects
@@ -228,7 +275,7 @@ export const Projects = ({ onNavigateToAll }) => {
               </svg>
             </span>
             <div className="absolute inset-0 w-full h-full bg-white scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out" />
-          </button>
+          </a>
 
         </div>
       </div>

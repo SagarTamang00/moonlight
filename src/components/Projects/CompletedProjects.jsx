@@ -119,32 +119,32 @@ export const CompletedProjects = () => {
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500" />
                     <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
                     <span className="absolute bottom-3 left-4 text-[10px] text-white/70 tracking-widest font-semibold drop-shadow-md z-10">
-                      {project.videos.length} VIDEOS
+                      {project.seasons ? `${project.seasons.length} SEASONS` : `${project.videos?.length || 0} VIDEOS`}
                     </span>
                   </div>
 
                   {/* Meta */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-[10px] text-white/30 tracking-[0.25em] uppercase">{project.releaseYear}</span>
-                      <span className="w-px h-3 bg-white/20" />
-                      <span className="text-[10px] text-white/30 tracking-[0.2em] uppercase">{project.genre}</span>
-                      <span className="w-px h-3 bg-white/20" />
-                      <span className="text-[10px] text-white/30 tracking-[0.2em] uppercase">{project.runtime}</span>
+                      <span className="text-[10px] text-white/80 tracking-[0.25em] uppercase">{project.releaseYear}</span>
+                      <span className="w-px h-3 bg-white/40" />
+                      <span className="text-[10px] text-white/80 tracking-[0.2em] uppercase">{project.genre}</span>
+                      <span className="w-px h-3 bg-white/40" />
+                      <span className="text-[10px] text-white/80 tracking-[0.2em] uppercase">{project.runtime}</span>
                     </div>
 
                     <h3 className="text-3xl sm:text-4xl lg:text-5xl font-cinematic text-white leading-none mb-4 group-hover:text-white/90 transition-colors">
                       {project.title}
                     </h3>
 
-                    <p className="text-sm text-white/30 tracking-[0.15em] uppercase">
+                    <p className="text-sm text-white/80 tracking-[0.15em] uppercase">
                       {project.awards}
                     </p>
                   </div>
 
                   {/* Expand toggle */}
                   <div className="hidden lg:flex items-center gap-3 shrink-0">
-                    <span className="text-xs text-white/30 tracking-widest uppercase">
+                    <span className="text-xs text-white/80 tracking-widest uppercase">
                       {isExpanded ? 'Close' : 'View All'}
                     </span>
                     <div className={`w-8 h-8 rounded-full border border-white/20 flex items-center justify-center transition-all duration-500 ${isExpanded ? 'rotate-45 bg-white/10' : 'group-hover:border-white/50'}`}>
@@ -159,68 +159,106 @@ export const CompletedProjects = () => {
                 {/* ── Expanded panel: video gallery + description ── */}
                 <div
                   className={`overflow-hidden transition-all duration-700 ease-in-out`}
-                  style={{ maxHeight: isExpanded ? '900px' : '0px' }}
+                  style={{ maxHeight: isExpanded ? '3000px' : '0px' }}
                 >
                   <div className="pb-12 lg:pb-16 flex flex-col gap-10">
 
                     {/* Description */}
-                    <p className="text-base lg:text-lg text-white/50 font-light leading-relaxed max-w-3xl border-l border-white/10 pl-6">
+                    <p className="text-base lg:text-lg text-white/90 font-light leading-relaxed max-w-3xl border-l border-white/20 pl-6">
                       {project.description}
                     </p>
 
                     {/* Video label */}
-                    <p className="text-[10px] tracking-[0.35em] uppercase text-white/25">
+                    <p className="text-[10px] tracking-[0.35em] uppercase text-white/70">
                       — AVAILABLE FOOTAGE
                     </p>
 
                     {/* Video grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                      {project.videos.map((video) => {
+                      {project.seasons ? project.seasons.map((season) => {
+                        const trailer = season.episodes?.[0]
+                        if (!trailer) return null
+                        const isActive = activeVideo === trailer.id
+                        return (
+                          <div key={season.seasonNumber} className="flex flex-col gap-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setActiveVideo(isActive ? null : trailer.id) }}
+                              className={`group/v relative aspect-[16/9] w-full overflow-hidden text-left transition-all duration-300 ${isActive ? 'ring-1 ring-white/60 ring-offset-2 ring-offset-black' : 'ring-1 ring-white/10 hover:ring-white/30'}`}
+                            >
+                              <img src={trailer.thumb} alt={trailer.label} className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${isActive ? 'grayscale-0 scale-105' : 'grayscale group-hover/v:grayscale-0 group-hover/v:scale-105'}`} />
+                              <div className={`absolute inset-0 transition-all duration-300 ${isActive ? 'bg-black/20' : 'bg-black/60 group-hover/v:bg-black/35'}`} />
+                              <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover/v:opacity-100'}`}>
+                                <div className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center">
+                                  {isActive ? <span className="w-3 h-3 flex gap-[3px] items-center"><span className="block w-[3px] h-3 bg-white rounded-sm" /><span className="block w-[3px] h-3 bg-white rounded-sm" /></span> : <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l9 4.5-9 4.5V1.5z" /></svg>}
+                                </div>
+                              </div>
+                              <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+                                <p className="text-[10px] text-white/80 leading-tight truncate">{trailer.label}</p>
+                                <p className="text-[9px] text-white/35 mt-0.5">{trailer.duration}</p>
+                              </div>
+                            </button>
+                            {season.playlistLink && (
+                              <a
+                                href={season.playlistLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full py-1.5 flex items-center justify-center gap-1.5 text-center text-[9px] uppercase tracking-widest text-white/70 hover:text-white hover:bg-white/10 border border-white/20 rounded transition-colors"
+                              >
+                                Watch Playlist ↗
+                              </a>
+                            )}
+                          </div>
+                        )
+                      }) : project.videos?.map((video) => {
                         const isActive = activeVideo === video.id
                         return (
-                          <button
-                            key={video.id}
-                            onClick={(e) => { e.stopPropagation(); setActiveVideo(isActive ? null : video.id) }}
-                            className={`group/v relative aspect-[16/9] overflow-hidden text-left transition-all duration-300 ${isActive ? 'ring-1 ring-white/60 ring-offset-2 ring-offset-black' : 'ring-1 ring-white/10 hover:ring-white/30'}`}
-                          >
-                            <img
-                              src={video.thumb}
-                              alt={video.label}
-                              className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${isActive ? 'grayscale-0 scale-105' : 'grayscale group-hover/v:grayscale-0 group-hover/v:scale-105'}`}
-                            />
-                            {/* Dark overlay */}
-                            <div className={`absolute inset-0 transition-all duration-300 ${isActive ? 'bg-black/20' : 'bg-black/60 group-hover/v:bg-black/35'}`} />
-
-                            {/* Play icon */}
-                            <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover/v:opacity-100'}`}>
-                              <div className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center">
-                                {isActive
-                                  ? <span className="w-3 h-3 flex gap-[3px] items-center"><span className="block w-[3px] h-3 bg-white rounded-sm" /><span className="block w-[3px] h-3 bg-white rounded-sm" /></span>
-                                  : <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l9 4.5-9 4.5V1.5z" /></svg>
-                                }
+                          <div key={video.id} className="flex flex-col gap-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setActiveVideo(isActive ? null : video.id) }}
+                              className={`group/v relative aspect-[16/9] w-full overflow-hidden text-left transition-all duration-300 ${isActive ? 'ring-1 ring-white/60 ring-offset-2 ring-offset-black' : 'ring-1 ring-white/10 hover:ring-white/30'}`}
+                            >
+                              <img src={video.thumb} alt={video.label} className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${isActive ? 'grayscale-0 scale-105' : 'grayscale group-hover/v:grayscale-0 group-hover/v:scale-105'}`} />
+                              <div className={`absolute inset-0 transition-all duration-300 ${isActive ? 'bg-black/20' : 'bg-black/60 group-hover/v:bg-black/35'}`} />
+                              <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover/v:opacity-100'}`}>
+                                <div className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center">
+                                  {isActive ? <span className="w-3 h-3 flex gap-[3px] items-center"><span className="block w-[3px] h-3 bg-white rounded-sm" /><span className="block w-[3px] h-3 bg-white rounded-sm" /></span> : <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l9 4.5-9 4.5V1.5z" /></svg>}
+                                </div>
                               </div>
-                            </div>
-
-                            {/* Label + duration */}
-                            <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-                              <p className="text-[10px] text-white/80 leading-tight truncate">{video.label}</p>
-                              <p className="text-[9px] text-white/35 mt-0.5">{video.duration}</p>
-                            </div>
-                          </button>
+                              <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+                                <p className="text-[10px] text-white/80 leading-tight truncate">{video.label}</p>
+                                <p className="text-[9px] text-white/35 mt-0.5">{video.duration}</p>
+                              </div>
+                            </button>
+                            {video.playlistLink && (
+                              <a
+                                href={video.playlistLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full py-1.5 flex items-center justify-center gap-1.5 text-center text-[9px] uppercase tracking-widest text-white/70 hover:text-white hover:bg-white/10 border border-white/20 rounded transition-colors"
+                              >
+                                Watch Full Movie ↗
+                              </a>
+                            )}
+                          </div>
                         )
                       })}
                     </div>
 
                     {/* Active video player placeholder */}
                     {activeVideo && (() => {
-                      const videoData = project.videos.find(v => v.id === activeVideo)
+                      const allVideos = project.seasons 
+                        ? project.seasons.flatMap(s => s.episodes || []) 
+                        : (project.videos || []);
+                      const videoData = allVideos.find(v => v.id === activeVideo);
                       return (
                         <div className="relative w-full aspect-video bg-black/60 flex items-center justify-center border border-white/10 overflow-hidden">
 
                           {isPlaying && videoData?.youtubeLink ? (
-                            <div className="absolute inset-6 md:inset-12 lg:inset-16 z-10 bg-black rounded-lg overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-white/10">
+                            <div className="relative w-[90%] md:w-[85%] lg:w-[80%] aspect-video z-10 bg-black rounded-lg overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-white/10">
                               <iframe
-                                className="w-full h-full"
+                                className="absolute inset-0 w-full h-full"
                                 src={getYouTubeEmbedUrl(videoData.youtubeLink)}
                                 title={videoData.label}
                                 frameBorder="0"

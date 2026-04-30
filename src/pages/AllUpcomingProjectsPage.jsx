@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { releasedProjects } from '../components/Projects/projectsData';
+import { ALL_PROJECTS } from '../components/Projects/Projects';
 
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return '';
@@ -15,13 +14,6 @@ const getYouTubeEmbedUrl = (url) => {
 const ProjectModal = ({ project, onClose }) => {
   const [activeVideo, setActiveVideo] = useState(null);
   const [activeSeasonIndex, setActiveSeasonIndex] = useState(0);
-
-  const hasSeasons = project?.seasons && project.seasons.length > 0;
-  const hasFlatVideos = project?.videos && project.videos.length > 0;
-  
-  const currentVideos = hasSeasons 
-    ? project.seasons[activeSeasonIndex]?.episodes || []
-    : project.videos || [];
 
   useEffect(() => {
     // Lock body scroll when modal opens
@@ -43,7 +35,23 @@ const ProjectModal = ({ project, onClose }) => {
     };
   }, [onClose]);
 
+  // Reset active video when switching seasons
+  useEffect(() => {
+    setActiveVideo(null);
+  }, [activeSeasonIndex]);
+
   if (!project) return null;
+
+  const hasSeasons = project.seasons && project.seasons.length > 0;
+  const hasFlatVideos = project.videos && project.videos.length > 0;
+  
+  // Determine which list of videos to show
+  let currentVideos = [];
+  if (hasSeasons) {
+    currentVideos = project.seasons[activeSeasonIndex]?.episodes || [];
+  } else if (hasFlatVideos) {
+    currentVideos = project.videos;
+  }
 
   return (
     <div
@@ -65,10 +73,10 @@ const ProjectModal = ({ project, onClose }) => {
           {/* Blurred Background */}
           <div 
             className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-125" 
-            style={{ backgroundImage: `url(${project.coverImage})` }} 
+            style={{ backgroundImage: `url(${project.image})` }} 
           />
           <img
-            src={project.coverImage}
+            src={project.image}
             alt={project.title}
             className="relative w-full h-full object-contain z-10"
           />
@@ -88,25 +96,23 @@ const ProjectModal = ({ project, onClose }) => {
           {/* Title overlay */}
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-center gap-3 mb-2 flex-wrap">
-              {project.releaseYear && (
-                <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.releaseYear}</span>
+              {project.status && (
+                <span className={`px-2 py-0.5 rounded text-[10px] tracking-[0.2em] uppercase border ${
+                  project.status === 'Ongoing' ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300' : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
+                }`}>
+                  {project.status}
+                </span>
               )}
-              {project.genre && (
+              {project.release && (
                 <>
                   <span className="w-px h-3 bg-white/30" />
-                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.genre}</span>
+                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.release}</span>
                 </>
               )}
-              {project.duration && (
+              {project.category && (
                 <>
                   <span className="w-px h-3 bg-white/30" />
-                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.duration}</span>
-                </>
-              )}
-              {project.language && (
-                <>
-                  <span className="w-px h-3 bg-white/30" />
-                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.language}</span>
+                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.category}</span>
                 </>
               )}
             </div>
@@ -128,32 +134,18 @@ const ProjectModal = ({ project, onClose }) => {
           )}
 
           {/* Meta Grid */}
-          {(project.director || project.producer || project.studio || project.cast) && (
+          {(project.network || project.digital_partner) && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 border-t border-white/10 pt-6">
-              {project.director && (
+              {project.network && (
                 <div>
-                  <p className="text-[9px] tracking-[0.25em] uppercase text-white/30 mb-1">Director</p>
-                  <p className="text-sm text-white/80">{project.director}</p>
+                  <p className="text-[9px] tracking-[0.25em] uppercase text-white/30 mb-1">Network</p>
+                  <p className="text-sm text-white/80">{project.network}</p>
                 </div>
               )}
-              {project.producer && (
+              {project.digital_partner && (
                 <div>
-                  <p className="text-[9px] tracking-[0.25em] uppercase text-white/30 mb-1">Producer</p>
-                  <p className="text-sm text-white/80">{project.producer}</p>
-                </div>
-              )}
-              {project.studio && (
-                <div>
-                  <p className="text-[9px] tracking-[0.25em] uppercase text-white/30 mb-1">Studio</p>
-                  <p className="text-sm text-white/80">{project.studio}</p>
-                </div>
-              )}
-              {project.cast && (
-                <div className="col-span-2 sm:col-span-3">
-                  <p className="text-[9px] tracking-[0.25em] uppercase text-white/30 mb-1">Cast</p>
-                  <p className="text-sm text-white/80 leading-relaxed">
-                    {Array.isArray(project.cast) ? project.cast.join(', ') : project.cast}
-                  </p>
+                  <p className="text-[9px] tracking-[0.25em] uppercase text-white/30 mb-1">Digital Partner</p>
+                  <p className="text-sm text-white/80">{project.digital_partner}</p>
                 </div>
               )}
             </div>
@@ -248,7 +240,7 @@ const ProjectModal = ({ project, onClose }) => {
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] uppercase tracking-wider text-white/50 hover:text-white mr-1 shrink-0 border border-white/20 px-2 py-1 rounded"
+                            className="text-[10px] uppercase tracking-wider text-white/50 hover:text-white mr-1 shrink-0 border border-white/20 px-2 py-1 rounded transition-colors"
                           >
                             YT
                           </a>
@@ -267,9 +259,9 @@ const ProjectModal = ({ project, onClose }) => {
 };
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
-export const AllProjectsPage = () => {
-  const [activeVideo, setActiveVideo] = useState(null);
+export const AllUpcomingProjectsPage = () => {
   const [selectedProject, setSelectedProject] = useState(null);
+  const [filter, setFilter] = useState('All');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -277,11 +269,18 @@ export const AllProjectsPage = () => {
 
   const handleCloseModal = useCallback(() => setSelectedProject(null), []);
 
+  const filteredProjects = ALL_PROJECTS.filter(p => {
+    if (filter === 'All') return true;
+    return p.status === filter;
+  });
+
+  const filterOptions = ['All', 'Ongoing', 'Upcoming'];
+
   return (
     <>
       <div className="min-h-screen bg-moon-black text-moon-white py-20 px-6 sm:px-10 lg:px-16 overflow-y-auto">
-        {/* Header */}
-        <div className="max-w-screen-xl mx-auto mb-16 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-white/10 pb-10">
+        {/* Header & Filters */}
+        <div className="max-w-screen-xl mx-auto mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-white/10 pb-10">
           <div>
             <a
               href="/"
@@ -293,14 +292,31 @@ export const AllProjectsPage = () => {
               className="text-4xl sm:text-5xl lg:text-7xl font-cinematic text-white leading-none mt-4"
               style={{ textShadow: '0 0 60px rgba(255,255,255,0.08)' }}
             >
-              ALL <span className="text-white/20">PROJECTS</span>
+              OUR <span className="text-white/20">PRODUCTION</span>
             </h1>
+          </div>
+          
+          {/* Filters */}
+          <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded-full border border-white/10">
+            {filterOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => setFilter(option)}
+                className={`px-6 py-2 rounded-full text-xs tracking-[0.2em] uppercase transition-all duration-300 ${
+                  filter === option 
+                    ? 'bg-white text-black font-semibold shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
+                    : 'text-white/50 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Grid of Projects */}
         <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {releasedProjects.map((project) => (
+          {filteredProjects.map((project) => (
             <div
               key={project.id}
               className="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 flex flex-col"
@@ -310,25 +326,32 @@ export const AllProjectsPage = () => {
                 {/* Blurred Background */}
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-xl opacity-40 scale-125 transition-transform duration-1000 group-hover:scale-150"
-                  style={{ backgroundImage: `url(${project.coverImage})` }}
+                  style={{ backgroundImage: `url(${project.image})` }}
                 />
                 <img
-                  src={project.coverImage}
+                  src={project.image}
                   alt={project.title}
                   className="relative w-full h-full object-contain transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100 z-10"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-20" />
+                <div className="absolute top-4 right-4">
+                  <span className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${
+                      project.status === 'Ongoing'
+                        ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
+                        : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
+                    }`}>
+                    {project.status}
+                  </span>
+                </div>
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.releaseYear}</span>
-                    <span className="w-px h-3 bg-white/30" />
-                    <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.genre}</span>
+                    <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.category}</span>
                   </div>
                   <h3 className="text-2xl font-cinematic text-white drop-shadow-md">{project.title}</h3>
                 </div>
               </div>
 
-              {/* Description & Videos */}
+              {/* Description & Videos Link */}
               <div className="p-6 flex-1 flex flex-col">
                 <p className="text-sm text-white/50 line-clamp-3 mb-4 font-light">
                   {project.description}
@@ -337,75 +360,19 @@ export const AllProjectsPage = () => {
                 {/* See More Button */}
                 <button
                   onClick={() => setSelectedProject(project)}
-                  className="self-start mb-5 text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white border-b border-white/20 hover:border-white/60 pb-0.5 transition-colors"
+                  className="mt-auto self-start text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white border-b border-white/20 hover:border-white/60 pb-0.5 transition-colors"
                 >
-                  See More ↗
+                  View Details & Videos ↗
                 </button>
-
-                <div className="mt-auto">
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-3">Videos</p>
-                  <div className="flex flex-col gap-3">
-                    {project.videos && project.videos.map((video) => (
-                      <div key={video.id} className="w-full">
-                        {activeVideo === video.id && video.youtubeLink ? (
-                          <div className="w-full mb-2 relative">
-                            <button
-                              onClick={() => setActiveVideo(null)}
-                              className="absolute -top-2 -right-2 z-10 w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 border border-white/30 flex items-center justify-center transition-colors"
-                              aria-label="Close video"
-                            >
-                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M1 1l10 10M11 1L1 11" />
-                              </svg>
-                            </button>
-                            <div className="w-full aspect-video rounded overflow-hidden bg-black ring-1 ring-white/20 shadow-xl">
-                              <iframe
-                                className="w-full h-full"
-                                src={getYouTubeEmbedUrl(video.youtubeLink)}
-                                title={video.label}
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setActiveVideo(video.id)}
-                            className="flex items-center gap-3 w-full p-2 rounded bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-left"
-                          >
-                            <div className="w-12 h-8 rounded overflow-hidden relative shrink-0">
-                              <img src={video.thumb} alt={video.label} className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor">
-                                  <path d="M2 1.5l9 4.5-9 4.5V1.5z" />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs text-white/90 truncate">{video.label}</p>
-                              <p className="text-[9px] text-white/40">{video.duration}</p>
-                            </div>
-                            {video.youtubeLink && (
-                              <a
-                                href={video.youtubeLink}
-                                target="_blank"
-                                rel="noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="text-[10px] uppercase tracking-wider text-white/50 hover:text-white mr-2 shrink-0 border border-white/20 px-2 py-1 rounded"
-                              >
-                                YT
-                              </a>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           ))}
+          
+          {filteredProjects.length === 0 && (
+            <div className="col-span-full py-20 text-center text-white/40">
+              <p className="tracking-widest uppercase">No projects found in this category.</p>
+            </div>
+          )}
         </div>
       </div>
 

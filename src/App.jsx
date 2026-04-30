@@ -16,6 +16,7 @@ import { Footer } from './components/Footer/Footer'
 import { Header } from './components/Header/Header'
 import { Routes, Route } from 'react-router-dom'
 import { AllProjectsPage } from './pages/AllProjectsPage'
+import { AllUpcomingProjectsPage } from './pages/AllUpcomingProjectsPage'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -26,6 +27,12 @@ function App() {
   const spotlightRef = useRef(null)
   const [moonReady, setMoonReady] = useState(false)
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight })
+
+  // Calculate dynamic FOV to maintain constant horizontal scale
+  // This prevents the moon from shrinking ("going backward") when DevTools open
+  const referenceHeight = 1050;
+  const K = Math.tan((45 * Math.PI / 180) / 2) / referenceHeight;
+  const dynamicFov = 2 * Math.atan(K * windowSize.height) * (180 / Math.PI);
 
   useEffect(() => {
     const handleResize = () => setWindowSize({ width: window.innerWidth, height: window.innerHeight })
@@ -40,9 +47,10 @@ function App() {
     let startX = -1.0
     if (gapRef.current) {
       const rect = gapRef.current.getBoundingClientRect()
-      const px = rect.left + rect.width / 2
+      // Shift moon slightly to the left (1.5vw) to prevent the 'O' from hiding it
+      const px = rect.left + rect.width / 2 - (window.innerWidth * 0.015)
       const ndcX = (px / window.innerWidth) * 2 - 1
-      const fov = 45 * Math.PI / 180
+      const fov = dynamicFov * Math.PI / 180
       const heightAtZ0 = 2 * Math.tan(fov / 2) * 5
       const widthAtZ0 = heightAtZ0 * (window.innerWidth / window.innerHeight)
       startX = ndcX * (widthAtZ0 / 2)
@@ -59,6 +67,23 @@ function App() {
       y: window.innerWidth < 1024 ? 0.65 : 0.6,
       z: window.innerWidth < 1024 ? 0.65 : 0.6
     })
+    gsap.set(moonRef.current.rotation, {
+      x: 0,
+      y: 0,
+      z: 0
+    })
+
+    if (spotlightRef.current?.light) {
+      gsap.set(spotlightRef.current.light, {
+        intensity: 0,
+        angle: 0.4
+      })
+      gsap.set(spotlightRef.current.target.position, {
+        x: -3,
+        y: 0,
+        z: 2
+      })
+    }
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -191,7 +216,7 @@ function App() {
 
             {/* Fixed 3D Canvas Layer */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-              <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+              <Canvas camera={{ position: [0, 0, 5], fov: dynamicFov }}>
                 <ambientLight intensity={0.01} />
                 <directionalLight position={[10, 0, 2]} intensity={4} color="#ffffff" />
                 {/* Starry Background */}
@@ -215,6 +240,7 @@ function App() {
           </div>
         } />
         <Route path="/all-projects" element={<AllProjectsPage />} />
+        <Route path="/upcoming-projects" element={<AllUpcomingProjectsPage />} />
       </Routes>
     </LenisWrapper>
   )

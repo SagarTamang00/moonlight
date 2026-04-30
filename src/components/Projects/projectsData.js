@@ -23,8 +23,15 @@ export const releasedProjects = [
     description:
       'Pandit Bajeko Lauri is a social drama that uncovers the hidden hypocrisy and deep-rooted caste discrimination within a traditional Nepali village. The story centers on a respected priest whose ritual stick serves as a symbol of authority, while secretly masking his involvement in the exploitation of the marginalized Badi community. As an outsider arrives to fight for social reform, the film exposes the dark double standards of those who uphold religious traditions while privately violating them.',
     coverImage: '/pandit.jpg',
-    videos: [
-      { id: 'v2a', label: 'Movie Trailer', duration: '2:47', thumb: '/pandit-1.jpg', youtubeLink: 'https://youtu.be/tQm046IeGaA?si=GQlmmF5vYKLE4D4w' },
+    seasons: [
+      {
+        seasonNumber: 1,
+        seasonTitle: 'Season 1',
+        playlistLink: 'https://www.youtube.com/playlist?list=PL...',
+        episodes: [
+          { id: 'v2s1t', label: 'Season 1 Official Trailer', duration: '2:47', thumb: '/pandit-1.jpg', youtubeLink: 'https://youtu.be/tQm046IeGaA?si=GQlmmF5vYKLE4D4w' }
+        ]
+      }
     ],
   },
   {
