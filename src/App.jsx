@@ -17,6 +17,7 @@ import { Header } from './components/Header/Header'
 import { Routes, Route } from 'react-router-dom'
 import { AllProjectsPage } from './pages/AllProjectsPage'
 import { AllUpcomingProjectsPage } from './pages/AllUpcomingProjectsPage'
+import AdminLogin from "./pages/AdminLogin"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -241,6 +242,7 @@ function App() {
         } />
         <Route path="/all-projects" element={<AllProjectsPage />} />
         <Route path="/upcoming-projects" element={<AllUpcomingProjectsPage />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
       </Routes>
     </LenisWrapper>
   )
