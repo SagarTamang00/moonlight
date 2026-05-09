@@ -1,5 +1,7 @@
 import { useState } from "react";
 import API from "../utils/api";
+import checkAuthAndRedirect from "../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
     const [formData, setFormData] = useState({
@@ -23,8 +25,7 @@ const AdminLogin = () => {
             console.log(res.data);
 
             localStorage.setItem("token", res.data.token);
-
-            alert("Login Successful");
+            checkAuthAndRedirect(navigate);
         } catch (error) {
             console.log(error);
             alert("Login Failed");
