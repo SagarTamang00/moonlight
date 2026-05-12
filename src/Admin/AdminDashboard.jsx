@@ -1,5 +1,7 @@
 import { useState } from "react";
-
+import AdminSettings from "./AdminSettings";
+import useSettings from "../hooks/useSettings";
+import AdminSocialLinks from "./AdminSocialLinks";
 const NAV = [
   {
     grp: "Main",
@@ -73,6 +75,8 @@ export default function AdminDashboard() {
   const [dark, setDark] = useState(false);
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const { settings } = useSettings();
 
   return (
     <div
@@ -112,6 +116,22 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
 
               <div className="flex items-center gap-3">
+                {/* Logo Image OR fallback */}
+            <div className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center overflow-hidden">
+
+                {settings?.logo ? (
+                    <img
+                        src={`http://localhost:5000${settings.logo}`}
+                        alt="logo"
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <span className="text-black font-bold text-lg">
+                        M
+                    </span>
+                )}
+
+            </div>
                 <div className="w-11 h-11 rounded-2xl bg-white text-black flex items-center justify-center font-bold text-lg">
                   M
                 </div>
@@ -198,6 +218,11 @@ export default function AdminDashboard() {
             </div>
           </div>
         </aside>
+        <div>
+            <h1>Admin Dashboard</h1>
+<AdminSocialLinks />
+            
+        </div>
 
         {/* MAIN */}
         <main className="flex-1 flex flex-col overflow-hidden w-full">
