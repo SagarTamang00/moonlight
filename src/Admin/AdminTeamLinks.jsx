@@ -1,9 +1,9 @@
 import { useState } from "react";
-import useSocialLinks from "../hooks/useSocialLinks";
-import { createSocialLink, deleteSocialLink } from "../api/socialLinks";
+import useTeamMemberLinks from "../hooks/useTeamMemberLinks";
+import { createMemberLink, deleteMemberLink } from "../api/teamLinks";
 
-const AdminSocialLinks = () => {
-    const { links, loading, refetch } = useSocialLinks();
+const AdminTeamLinks = ({ memberId }) => {
+    const { links, loading, refetch } = useTeamMemberLinks(memberId);
 
     const [form, setForm] = useState({
         platform: "",
@@ -17,49 +17,47 @@ const AdminSocialLinks = () => {
         });
     };
 
-    // CREATE
     const handleAdd = async (e) => {
         e.preventDefault();
 
         try {
-            await createSocialLink(form);
+            await createMemberLink({
+                member_id: memberId,
+                ...form
+            });
 
-            alert("Added successfully");
+            alert("Link added");
 
-            setForm({ platform: "", url: "" }); // reset form
-
-            refetch(); // 🔥 no reload
+            setForm({ platform: "", url: "" });
+            refetch();
         } catch (err) {
             console.log(err);
-            alert("Failed to add");
+            alert("Failed");
         }
     };
 
-    // DELETE
     const handleDelete = async (id) => {
         try {
-            await deleteSocialLink(id);
+            await deleteMemberLink(id);
 
-            alert("Deleted successfully");
-
-            refetch(); // 🔥 no reload
+            alert("Deleted");
+            refetch();
         } catch (err) {
             console.log(err);
             alert("Delete failed");
         }
     };
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <p>Loading links...</p>;
 
     return (
-        <div>
-            <h2>Social Links Admin</h2>
+        <div style={{ marginTop: "10px" }}>
+            <h4>Links</h4>
 
-            {/* CREATE FORM */}
             <form onSubmit={handleAdd}>
                 <input
                     name="platform"
-                    placeholder="Platform (facebook, insta...)"
+                    placeholder="Platform"
                     value={form.platform}
                     onChange={handleChange}
                 />
@@ -71,19 +69,14 @@ const AdminSocialLinks = () => {
                     onChange={handleChange}
                 />
 
-                <button type="submit">
-                    Add
-                </button>
+                <button type="submit">Add Link</button>
             </form>
 
-            {/* LIST */}
             <div>
-                {links.map((item) => (
-                    <div key={item.id}>
-                        <span>{item.platform}</span>
-                        <span>{item.url}</span>
-
-                        <button onClick={() => handleDelete(item.id)}>
+                {links.map(link => (
+                    <div key={link.id}>
+                        {link.platform} - {link.url}
+                        <button onClick={() => handleDelete(link.id)}>
                             Delete
                         </button>
                     </div>
@@ -93,4 +86,4 @@ const AdminSocialLinks = () => {
     );
 };
 
-export default AdminSocialLinks;
+export default AdminTeamLinks;

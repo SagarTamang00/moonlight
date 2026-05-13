@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import API from "../utils/api";
 import useSettings from "../hooks/useSettings";
+import { updateSettings } from "../api/settings";
 
 const AdminSettings = () => {
     const { settings, loading } = useSettings();
@@ -55,12 +55,7 @@ const AdminSettings = () => {
         }
 
         try {
-            const res = await API.put("/settings", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            });
-
+            const res = await updateSettings(formData);
             alert(res.data.message);
         } catch (err) {
             console.log(err);
@@ -75,10 +70,8 @@ const AdminSettings = () => {
             <h2>Admin Settings</h2>
 
             <form onSubmit={handleSubmit}>
-                {/* Logo upload */}
                 <input type="file" onChange={handleFile} />
 
-                {/* About */}
                 <input
                     name="about_description"
                     placeholder="About Description"
@@ -86,7 +79,6 @@ const AdminSettings = () => {
                     onChange={handleChange}
                 />
 
-                {/* Google Maps */}
                 <input
                     name="google_maps_link"
                     placeholder="Google Maps Link"
@@ -94,7 +86,6 @@ const AdminSettings = () => {
                     onChange={handleChange}
                 />
 
-                {/* Email */}
                 <input
                     name="contact_email"
                     placeholder="Contact Email"
@@ -102,7 +93,6 @@ const AdminSettings = () => {
                     onChange={handleChange}
                 />
 
-                {/* Phone */}
                 <input
                     name="contact_phone"
                     placeholder="Contact Phone"
@@ -115,7 +105,6 @@ const AdminSettings = () => {
                 </button>
             </form>
 
-            {/* Optional preview */}
             {settings?.logo && (
                 <img
                     src={`http://localhost:5000${settings.logo}`}
