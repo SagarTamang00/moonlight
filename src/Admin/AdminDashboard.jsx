@@ -219,9 +219,7 @@ export default function AdminDashboard() {
           </div>
         </aside>
         <div>
-            <h1>Admin Dashboard</h1>
-<AdminSocialLinks />
-            
+            <h1>Admin Dashboard</h1>            
         </div>
 
         {/* MAIN */}
