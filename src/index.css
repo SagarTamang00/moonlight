@@ -4,6 +4,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* THEME VARIABLES */
+:root {
+  /* Light Mode */
+  --color-bg: #f8f8f8;
+  --color-bg-section: #ffffff;
+  --color-text: #111111;
+  --color-heading: #000000;
+  --color-body: #5f5f5f;
+
+  --scroll-track: #ececec;
+  --scroll-thumb: #111111;
+}
+
+.dark {
+  /* Dark Mode */
+  --color-bg: #050505;
+  --color-bg-section: #0a0a0a;
+  --color-text: #f0f0f0;
+  --color-heading: #ffffff;
+  --color-body: #b5b5b5;
+
+  --scroll-track: #0a0a0a;
+  --scroll-thumb: #c0c0c0;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -11,13 +36,17 @@
 }
 
 html {
-  background: #050505;
-  color: #f0f0f0;
+  background: var(--color-bg);
+  color: var(--color-text);
   overflow-x: hidden;
+  transition: background 0.35s ease, color 0.35s ease;
 }
 
 body {
   font-family: 'Inter', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: background 0.35s ease, color 0.35s ease;
 }
 
 ::-webkit-scrollbar {
@@ -25,120 +54,10 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--scroll-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c0c0c0;
+  background: var(--scroll-thumb);
   border-radius: 3px;
-}
-
-/* ─── Satellite Spotlight Beam Effects ─── */
-
-/* Volumetric light cone overlay that appears on About/Team tooltips */
-.about-tooltip,
-.team-tooltip {
-  position: relative;
-  transition: box-shadow 0.8s ease, filter 0.8s ease;
-}
-
-/* When tooltips become visible (via GSAP autoAlpha), add the spotlight glow */
-.about-tooltip[style*="visibility: visible"],
-.about-tooltip[style*="visibility: inherit"] {
-  box-shadow:
-    0 0 20px 4px rgba(136, 204, 255, 0.15),
-    0 0 60px 15px rgba(136, 204, 255, 0.08),
-    0 0 120px 40px rgba(136, 204, 255, 0.04),
-    inset 0 0 15px rgba(136, 204, 255, 0.06);
-  animation: satelliteFlicker 3s ease-in-out infinite;
-}
-
-.team-tooltip[style*="visibility: visible"],
-.team-tooltip[style*="visibility: inherit"] {
-  box-shadow:
-    0 0 20px 4px rgba(136, 204, 255, 0.15),
-    0 0 60px 15px rgba(136, 204, 255, 0.08),
-    0 0 120px 40px rgba(136, 204, 255, 0.04),
-    inset 0 0 15px rgba(136, 204, 255, 0.06);
-  animation: satelliteFlicker 3s ease-in-out infinite 0.5s;
-}
-
-/* Connecting line glow enhancement */
-.about-tooltip[style*="visibility: visible"] > div:last-child,
-.team-tooltip[style*="visibility: visible"] > div:last-child {
-  filter: drop-shadow(0 0 6px rgba(136, 204, 255, 0.4));
-}
-
-/* Subtle satellite flicker to simulate real satellite light behavior */
-@keyframes satelliteFlicker {
-  0%, 100% {
-    box-shadow:
-      0 0 20px 4px rgba(136, 204, 255, 0.15),
-      0 0 60px 15px rgba(136, 204, 255, 0.08),
-      0 0 120px 40px rgba(136, 204, 255, 0.04),
-      inset 0 0 15px rgba(136, 204, 255, 0.06);
-  }
-  30% {
-    box-shadow:
-      0 0 25px 6px rgba(136, 204, 255, 0.2),
-      0 0 70px 20px rgba(136, 204, 255, 0.12),
-      0 0 140px 50px rgba(136, 204, 255, 0.06),
-      inset 0 0 20px rgba(136, 204, 255, 0.1);
-  }
-  60% {
-    box-shadow:
-      0 0 15px 3px rgba(136, 204, 255, 0.12),
-      0 0 50px 12px rgba(136, 204, 255, 0.06),
-      0 0 100px 30px rgba(136, 204, 255, 0.03),
-      inset 0 0 10px rgba(136, 204, 255, 0.04);
-  }
-}
-
-/* Pulsing dot on the tooltip gets spotlight color boost */
-.about-tooltip[style*="visibility: visible"] .animate-pulse,
-.team-tooltip[style*="visibility: visible"] .animate-pulse {
-  background-color: #88ccff;
-  box-shadow: 0 0 8px 3px rgba(136, 204, 255, 0.5);
-}
-
-/* Volumetric light beam rays - radial gradient that simulates a cone of light */
-.about-tooltip[style*="visibility: visible"]::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -60px;
-  transform: translateY(-50%) rotate(15deg);
-  width: 200px;
-  height: 300px;
-  background: radial-gradient(
-    ellipse at right center,
-    rgba(136, 204, 255, 0.06) 0%,
-    rgba(136, 204, 255, 0.02) 40%,
-    transparent 70%
-  );
-  pointer-events: none;
-  animation: beamPulse 4s ease-in-out infinite;
-}
-
-.team-tooltip[style*="visibility: visible"]::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -60px;
-  transform: translateY(-50%) rotate(15deg);
-  width: 200px;
-  height: 300px;
-  background: radial-gradient(
-    ellipse at right center,
-    rgba(136, 204, 255, 0.06) 0%,
-    rgba(136, 204, 255, 0.02) 40%,
-    transparent 70%
-  );
-  pointer-events: none;
-  animation: beamPulse 4s ease-in-out infinite 1s;
-}
-
-@keyframes beamPulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
 }

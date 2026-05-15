@@ -4,292 +4,451 @@ import useProjects from "../hooks/useProjects";
 import useProjectCategories from "../hooks/useProjectCategories";
 
 import {
-    createProject,
-    deleteProject
+  createProject,
+  deleteProject,
 } from "../api/projectApi";
 
-
 const AdminProjects = () => {
+  const { projects, loading } =
+    useProjects();
 
-    const { projects, loading } = useProjects();
+  const { categories } =
+    useProjectCategories();
 
-    const { categories } = useProjectCategories();
+  const [formData, setFormData] = useState({
+    category_id: "",
+    title: "",
+    description: "",
+    duration: "",
+    seasons: "",
+    episodes: "",
+    release_year: "",
+    status: "upcoming",
+    featured: false,
+  });
 
+  const [poster, setPoster] =
+    useState(null);
 
-    const [formData, setFormData] = useState({
-        category_id: "",
-        title: "",
-        description: "",
-        duration: "",
-        seasons: "",
-        episodes: "",
-        release_year: "",
-        status: "upcoming",
-        featured: false
+  // HANDLE INPUT CHANGE
+  const handleChange = (e) => {
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     });
+  };
 
-    const [poster, setPoster] = useState(null);
+  // HANDLE FILE CHANGE
+  const handlePosterChange = (e) => {
+    setPoster(e.target.files[0]);
+  };
 
+  // CREATE PROJECT
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // HANDLE INPUT CHANGE
-    const handleChange = (e) => {
+    try {
 
-        const { name, value, type, checked } = e.target;
+      const data = new FormData();
 
-        setFormData({
-            ...formData,
-            [name]: type === "checkbox"
-                ? checked
-                : value
-        });
-    };
-
-
-    // HANDLE FILE CHANGE
-    const handlePosterChange = (e) => {
-
-        setPoster(e.target.files[0]);
-    };
-
-
-    // CREATE PROJECT
-    const handleSubmit = async (e) => {
-
-        e.preventDefault();
-
-        try {
-
-            const data = new FormData();
-
-            Object.keys(formData).forEach((key) => {
-                data.append(key, formData[key]);
-            });
-
-            if (poster) {
-                data.append("poster", poster);
-            }
-
-            await createProject(data);
-
-            alert("Project created successfully");
-
-            window.location.reload();
-
-        } catch (err) {
-
-            console.log(err);
-
-            alert("Failed to create project");
+      Object.keys(formData).forEach(
+        (key) => {
+          data.append(
+            key,
+            formData[key]
+          );
         }
-    };
+      );
 
+      if (poster) {
+        data.append("poster", poster);
+      }
 
-    // DELETE PROJECT
-    const handleDelete = async (id) => {
+      await createProject(data);
 
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this project?"
-        );
+      alert(
+        "Project created successfully"
+      );
 
-        if (!confirmDelete) return;
+      window.location.reload();
 
-        try {
+    } catch (err) {
 
-            await deleteProject(id);
+      console.log(err);
 
-            alert("Project deleted successfully");
-
-            window.location.reload();
-
-        } catch (err) {
-
-            console.log(err);
-
-            alert("Failed to delete project");
-        }
-    };
-
-
-    if (loading) {
-        return <p>Loading...</p>;
+      alert(
+        "Failed to create project"
+      );
     }
+  };
 
+  // DELETE PROJECT
+  const handleDelete = async (id) => {
 
+    const confirmDelete =
+      window.confirm(
+        "Are you sure you want to delete this project?"
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      await deleteProject(id);
+
+      alert(
+        "Project deleted successfully"
+      );
+
+      window.location.reload();
+
+    } catch (err) {
+
+      console.log(err);
+
+      alert(
+        "Failed to delete project"
+      );
+    }
+  };
+
+  if (loading) {
     return (
-        <div>
+      <div className="p-10 text-black dark:text-white">
+        Loading...
+      </div>
+    );
+  }
 
-            <h2>Projects Admin</h2>
+  return (
+    <div className="min-h-screen bg-white dark:bg-black p-6 md:p-10 transition-all duration-300">
 
-            {/* CREATE FORM */}
-            <form onSubmit={handleSubmit}>
+      {/* HEADER */}
+      <div className="mb-10">
 
-                {/* CATEGORY */}
-                <select
-                    name="category_id"
-                    value={formData.category_id}
-                    onChange={handleChange}
-                    required
-                >
+        <h2
+          style={{
+            fontFamily:
+              "'Syne', sans-serif",
+          }}
+          className="text-3xl font-bold text-black dark:text-white"
+        >
+          Projects
+        </h2>
 
-                    <option value="">
-                        Select Category
-                    </option>
+        <p className="text-gray-500 mt-2">
+          Create and manage projects.
+        </p>
 
-                    {categories.map((category) => (
+      </div>
 
-                        <option
-                            key={category.id}
-                            value={category.id}
-                        >
-                            {category.name}
-                        </option>
-                    ))}
+      {/* CREATE FORM */}
+      <div className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10">
 
-                </select>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-5"
+        >
 
+          {/* CATEGORY */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Category
+            </label>
 
-                {/* TITLE */}
-                <input
-                    type="text"
-                    name="title"
-                    placeholder="Project Title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    required
-                />
+            <select
+              name="category_id"
+              value={
+                formData.category_id
+              }
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            >
 
+              <option value="">
+                Select Category
+              </option>
 
-                {/* DESCRIPTION */}
-                <textarea
-                    name="description"
-                    placeholder="Description"
-                    value={formData.description}
-                    onChange={handleChange}
-                />
+              {categories.map(
+                (category) => (
 
+                  <option
+                    key={category.id}
+                    value={category.id}
+                  >
+                    {category.name}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
 
-                {/* POSTER */}
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePosterChange}
-                />
+          {/* TITLE */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Project Title
+            </label>
 
+            <input
+              type="text"
+              name="title"
+              placeholder="Project Title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
 
-                {/* DURATION */}
-                <input
-                    type="text"
-                    name="duration"
-                    placeholder="Duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                />
+          {/* DESCRIPTION */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Description
+            </label>
 
+            <textarea
+              name="description"
+              placeholder="Write description..."
+              value={
+                formData.description
+              }
+              onChange={handleChange}
+              rows={5}
+              className="w-full px-4 py-3 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all resize-none"
+            />
+          </div>
 
-                {/* SEASONS */}
-                <input
-                    type="number"
-                    name="seasons"
-                    placeholder="Seasons"
-                    value={formData.seasons}
-                    onChange={handleChange}
-                />
+          {/* POSTER */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Poster
+            </label>
 
+            <input
+              type="file"
+              accept="image/*"
+              onChange={
+                handlePosterChange
+              }
+              className="block w-full text-sm text-gray-600 dark:text-gray-300"
+            />
+          </div>
 
-                {/* EPISODES */}
-                <input
-                    type="number"
-                    name="episodes"
-                    placeholder="Episodes"
-                    value={formData.episodes}
-                    onChange={handleChange}
-                />
+          {/* DURATION */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Duration
+            </label>
 
+            <input
+              type="text"
+              name="duration"
+              placeholder="2h 30m"
+              value={
+                formData.duration
+              }
+              onChange={handleChange}
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
 
-                {/* RELEASE YEAR */}
-                <input
-                    type="number"
-                    name="release_year"
-                    placeholder="Release Year"
-                    value={formData.release_year}
-                    onChange={handleChange}
-                />
+          {/* SEASONS */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Seasons
+            </label>
 
+            <input
+              type="number"
+              name="seasons"
+              placeholder="0"
+              value={
+                formData.seasons
+              }
+              onChange={handleChange}
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
 
-                {/* STATUS */}
-                <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                >
-                    <option value="upcoming">
-                        Upcoming
-                    </option>
+          {/* EPISODES */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Episodes
+            </label>
 
-                    <option value="ongoing">
-                        Ongoing
-                    </option>
+            <input
+              type="number"
+              name="episodes"
+              placeholder="0"
+              value={
+                formData.episodes
+              }
+              onChange={handleChange}
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
 
-                    <option value="completed">
-                        Completed
-                    </option>
-                </select>
+          {/* RELEASE YEAR */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Release Year
+            </label>
 
+            <input
+              type="number"
+              name="release_year"
+              placeholder="2026"
+              value={
+                formData.release_year
+              }
+              onChange={handleChange}
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
 
-                {/* FEATURED */}
-                <label>
+          {/* STATUS */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Status
+            </label>
 
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            >
+
+              <option value="upcoming">
+                Upcoming
+              </option>
+
+              <option value="ongoing">
+                Ongoing
+              </option>
+
+              <option value="completed">
+                Completed
+              </option>
+
+            </select>
+          </div>
+
+          {/* FEATURED */}
+          <div className="md:col-span-2 flex items-center gap-3 pt-2">
+
+            <input
+              type="checkbox"
+              name="featured"
+              checked={
+                formData.featured
+              }
+              onChange={handleChange}
+              className="w-5 h-5 accent-black dark:accent-white"
+            />
+
+            <label className="text-black dark:text-white font-medium">
+              Featured Project
+            </label>
+
+          </div>
+
+          {/* BUTTON */}
+          <div className="md:col-span-2">
+
+            <button
+              type="submit"
+              className="h-12 px-6 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-medium hover:scale-[1.02] transition-all duration-300"
+            >
+              Create Project
+            </button>
+
+          </div>
+
+        </form>
+      </div>
+
+      {/* PROJECT LIST */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+        {projects.map((project) => (
+
+          <div
+            key={project.id}
+            className="bg-[#f8f8f8] dark:bg-[#111111] border border-[#ececec] dark:border-[#222222] rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
+
+            {/* IMAGE */}
+            <img
+              src={`http://localhost:5000${project.poster}`}
+              alt={project.title}
+              className="w-full h-[260px] object-cover"
+            />
+
+            {/* CONTENT */}
+            <div className="p-5">
+
+              {/* CATEGORY */}
+              <div className="mb-3">
+
+                <span className="inline-flex items-center px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-sm font-medium">
+                  {
+                    project.category_name
+                  }
+                </span>
+
+              </div>
+
+              {/* TITLE */}
+              <h3 className="text-2xl font-bold text-black dark:text-white mb-2">
+                {project.title}
+              </h3>
+
+              {/* STATUS */}
+              <p className="text-gray-500 capitalize mb-5">
+                {project.status}
+              </p>
+
+              {/* FEATURED */}
+              {project.featured && (
+                <div className="mb-5">
+
+                  <span className="inline-flex items-center px-3 py-1 rounded-full border border-black dark:border-white text-black dark:text-white text-xs font-medium">
                     Featured
+                  </span>
 
-                    <input
-                        type="checkbox"
-                        name="featured"
-                        checked={formData.featured}
-                        onChange={handleChange}
-                    />
+                </div>
+              )}
 
-                </label>
-
-
-                <button type="submit">
-                    Create Project
-                </button>
-
-            </form>
-
-
-            {/* PROJECT LIST */}
-            <div>
-
-                {projects.map((project) => (
-
-                    <div key={project.id}>
-
-                        <img
-                            src={`http://localhost:5000${project.poster}`}
-                            alt={project.title}
-                            width="120"
-                        />
-
-                        <h3>{project.title}</h3>
-
-                        <p>{project.category_name}</p>
-
-                        <p>{project.status}</p>
-
-                        <button
-                            onClick={() => handleDelete(project.id)}
-                        >
-                            Delete
-                        </button>
-
-                    </div>
-                ))}
+              {/* DELETE */}
+              <button
+                onClick={() =>
+                  handleDelete(
+                    project.id
+                  )
+                }
+                className="w-full h-11 rounded-2xl bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-all duration-300"
+              >
+                Delete Project
+              </button>
 
             </div>
-
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default AdminProjects;

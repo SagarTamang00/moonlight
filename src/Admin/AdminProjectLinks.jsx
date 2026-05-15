@@ -4,219 +4,283 @@ import useProjects from "../hooks/useProjects";
 import useProjectLinks from "../hooks/useProjectLinks";
 
 import {
-    createProjectLink,
-    deleteProjectLink
+  createProjectLink,
+  deleteProjectLink,
 } from "../api/projectLinkApi";
 
-
 const AdminProjectLinks = () => {
+  const { projects } = useProjects();
 
-    const { projects } = useProjects();
+  const [selectedProject, setSelectedProject] =
+    useState("");
 
-    const [selectedProject, setSelectedProject] = useState("");
+  const { links, loading } =
+    useProjectLinks(selectedProject);
 
-    const { links, loading } = useProjectLinks(selectedProject);
+  const [formData, setFormData] = useState({
+    project_id: "",
+    type: "",
+    url: "",
+  });
 
-
-    const [formData, setFormData] = useState({
-        project_id: "",
-        type: "",
-        url: ""
+  // HANDLE INPUT
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
+  };
 
+  // HANDLE PROJECT SELECT
+  const handleProjectSelect = (e) => {
+    const projectId = e.target.value;
 
-    // HANDLE INPUT
-    const handleChange = (e) => {
+    setSelectedProject(projectId);
 
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    setFormData({
+      ...formData,
+      project_id: projectId,
+    });
+  };
 
+  // CREATE LINK
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // HANDLE PROJECT SELECT
-    const handleProjectSelect = (e) => {
+    try {
 
-        const projectId = e.target.value;
+      await createProjectLink(formData);
 
-        setSelectedProject(projectId);
+      alert("Project link added successfully");
 
-        setFormData({
-            ...formData,
-            project_id: projectId
-        });
-    };
+      window.location.reload();
 
+    } catch (err) {
 
-    // CREATE LINK
-    const handleSubmit = async (e) => {
+      console.log(err);
 
-        e.preventDefault();
+      alert("Failed to add project link");
+    }
+  };
 
-        try {
+  // DELETE LINK
+  const handleDelete = async (id) => {
 
-            await createProjectLink(formData);
+    const confirmDelete = window.confirm(
+      "Delete this link?"
+    );
 
-            alert("Project link added successfully");
+    if (!confirmDelete) return;
 
-            window.location.reload();
+    try {
 
-        } catch (err) {
+      await deleteProjectLink(id);
 
-            console.log(err);
+      alert("Link deleted successfully");
 
-            alert("Failed to add project link");
-        }
-    };
+      window.location.reload();
 
+    } catch (err) {
 
-    // DELETE LINK
-    const handleDelete = async (id) => {
+      console.log(err);
 
-        const confirmDelete = window.confirm(
-            "Delete this link?"
-        );
+      alert("Failed to delete link");
+    }
+  };
 
-        if (!confirmDelete) return;
+  return (
+    <div className="min-h-screen bg-white dark:bg-black p-6 md:p-10 transition-all duration-300">
 
-        try {
+      {/* HEADER */}
+      <div className="mb-10">
 
-            await deleteProjectLink(id);
+        <h2
+          style={{ fontFamily: "'Syne', sans-serif" }}
+          className="text-3xl font-bold text-black dark:text-white"
+        >
+          Project Links
+        </h2>
 
-            alert("Link deleted successfully");
+        <p className="text-gray-500 mt-2">
+          Manage trailers, teasers, promos, playlists and watch links.
+        </p>
 
-            window.location.reload();
+      </div>
 
-        } catch (err) {
+      {/* SELECT PROJECT */}
+      <div className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-8">
 
-            console.log(err);
+        <label className="block text-sm font-medium text-black dark:text-white mb-3">
+          Select Project
+        </label>
 
-            alert("Failed to delete link");
-        }
-    };
+        <select
+          value={selectedProject}
+          onChange={handleProjectSelect}
+          className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+        >
 
+          <option value="">
+            Select Project
+          </option>
 
-    return (
-        <div>
+          {projects.map((project) => (
 
-            <h2>Project Links Admin</h2>
+            <option
+              key={project.id}
+              value={project.id}
+            >
+              {project.title}
+            </option>
+          ))}
+        </select>
+      </div>
 
+      {/* CREATE FORM */}
+      <div className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10">
 
-            {/* SELECT PROJECT */}
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-3 gap-5"
+        >
+
+          {/* TYPE */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Link Type
+            </label>
+
             <select
-                value={selectedProject}
-                onChange={handleProjectSelect}
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             >
 
-                <option value="">
-                    Select Project
-                </option>
+              <option value="">
+                Select Link Type
+              </option>
 
-                {projects.map((project) => (
+              <option value="trailer">
+                Trailer
+              </option>
 
-                    <option
-                        key={project.id}
-                        value={project.id}
-                    >
-                        {project.title}
-                    </option>
-                ))}
+              <option value="teaser">
+                Teaser
+              </option>
+
+              <option value="promo">
+                Promo
+              </option>
+
+              <option value="playlist">
+                Playlist
+              </option>
+
+              <option value="watch">
+                Watch
+              </option>
 
             </select>
+          </div>
 
+          {/* URL */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              URL
+            </label>
 
-            {/* CREATE LINK FORM */}
-            <form onSubmit={handleSubmit}>
+            <input
+              type="url"
+              name="url"
+              placeholder="https://example.com"
+              value={formData.url}
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
 
-                <select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
+          {/* BUTTON */}
+          <div className="md:col-span-3">
+            <button
+              type="submit"
+              className="h-12 px-6 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-medium hover:scale-[1.02] transition-all duration-300"
+            >
+              Add Link
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      {/* LINKS LIST */}
+      <div>
+
+        {loading ? (
+
+          <div className="text-black dark:text-white">
+            Loading...
+          </div>
+
+        ) : links.length === 0 ? (
+
+          <div className="bg-[#f8f8f8] dark:bg-[#111111] border border-[#ececec] dark:border-[#222222] rounded-3xl p-10 text-center">
+
+            <p className="text-gray-500">
+              No links found for this project.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            {links.map((link) => (
+
+              <div
+                key={link.id}
+                className="bg-[#f8f8f8] dark:bg-[#111111] border border-[#ececec] dark:border-[#222222] rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1"
+              >
+
+                {/* TYPE */}
+                <div className="mb-4">
+
+                  <span className="inline-flex items-center px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-sm font-medium capitalize">
+                    {link.type}
+                  </span>
+
+                </div>
+
+                {/* URL */}
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-sm text-gray-600 dark:text-gray-400 break-all hover:text-black dark:hover:text-white transition-all mb-6"
                 >
+                  {link.url}
+                </a>
 
-                    <option value="">
-                        Select Link Type
-                    </option>
-
-                    <option value="trailer">
-                        Trailer
-                    </option>
-
-                    <option value="teaser">
-                        Teaser
-                    </option>
-
-                    <option value="promo">
-                        Promo
-                    </option>
-
-                    <option value="playlist">
-                        Playlist
-                    </option>
-
-                    <option value="watch">
-                        Watch
-                    </option>
-
-                </select>
-
-
-                <input
-                    type="url"
-                    name="url"
-                    placeholder="Enter URL"
-                    value={formData.url}
-                    onChange={handleChange}
-                    required
-                />
-
-
-                <button type="submit">
-                    Add Link
+                {/* DELETE */}
+                <button
+                  onClick={() =>
+                    handleDelete(link.id)
+                  }
+                  className="w-full h-11 rounded-2xl bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-all duration-300"
+                >
+                  Delete Link
                 </button>
 
-            </form>
-
-
-            {/* LINKS LIST */}
-            <div>
-
-                {loading ? (
-
-                    <p>Loading...</p>
-
-                ) : (
-
-                    links.map((link) => (
-
-                        <div key={link.id}>
-
-                            <p>{link.type}</p>
-
-                            <a
-                                href={link.url}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {link.url}
-                            </a>
-
-                            <button
-                                onClick={() => handleDelete(link.id)}
-                            >
-                                Delete
-                            </button>
-
-                        </div>
-                    ))
-                )}
-
-            </div>
-
-        </div>
-    );
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default AdminProjectLinks;

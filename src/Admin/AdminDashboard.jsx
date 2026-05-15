@@ -4,6 +4,13 @@ import AdminSocialLinks from "./AdminSocialLinks";
 import AdminTeam from "./AdminTeam";
 import useSettings from "../hooks/useSettings";
 import useDarkMode from "../hooks/useDarkMode";
+import AdminPartners from "./AdminPartners";
+import AdminProjects from "./AdminProjects";
+import AdminNewsBlogs from "./AdminNewsBlogs";
+import AdminAudition from "./AdminAuditions";
+import AdminProjectCategories from "./AdminProjectCategories";
+import AdminProjectLinks from "./AdminProjectLinks";
+import AdminProjectMedia from "./AdminProjectMedia";
 import { BASE_URL } from "../utils/api";
 
 const NAV = [
@@ -14,6 +21,14 @@ const NAV = [
       { icon: "ti-settings", label: "Settings" },
       { icon: "ti-users", label: "Team" },
       { icon: "ti-link", label: "Social Links" },
+      { icon: "ti-handshake", label: "Partners" },
+      { icon: "ti-briefcase", label: "Projects" },
+      { icon: "ti-newspaper", label: "News & Blogs" },
+      { icon: "ti-microphone", label: "Auditions" },
+      { icon: "ti-tag", label: "Project Categories" },
+      { icon: "ti-link", label: "Project Links" },
+      { icon: "ti-image", label: "Project Media" },
+
     ],
   },
 ];
@@ -145,7 +160,7 @@ export default function AdminDashboard() {
                   </h1>
 
                   <p className="text-xs text-gray-500">
-                    Motion Admin
+                    Admin
                   </p>
                 </div>
               </div>
@@ -184,8 +199,6 @@ export default function AdminDashboard() {
                             : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1c1c1c] hover:text-black dark:hover:text-white"
                           }`}
                       >
-                        <i className={`ti ${item.icon} text-lg`} />
-
                         <span className="font-medium text-sm">
                           {item.label}
                         </span>
@@ -267,9 +280,17 @@ export default function AdminDashboard() {
 
           {/* CONTENT AREA */}
           <div className="flex-1 bg-white dark:bg-black w-full relative">
+
+            {activeNav === "Partners" && <AdminPartners />}
             {activeNav === "Settings" && <AdminSettings />}
             {activeNav === "Team" && <AdminTeam />}
             {activeNav === "Social Links" && <AdminSocialLinks />}
+            {activeNav === "Projects" && <AdminProjects />}
+            {activeNav === "News & Blogs" && <AdminNewsBlogs />}
+            {activeNav === "Auditions" && <AdminAudition />}
+            {activeNav === "Project Categories" && <AdminProjectCategories />}
+            {activeNav === "Project Links" && <AdminProjectLinks />}
+            {activeNav === "Project Media" && <AdminProjectMedia />}
             {activeNav === "Dashboard" && (
               <div className="p-8">
                 <h2 className="text-2xl font-bold text-black dark:text-white mb-4">Welcome to Admin Dashboard</h2>

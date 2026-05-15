@@ -10,6 +10,7 @@ import { Moon3D } from './components/Moon/Moon3D'
 import { Hero } from './components/Hero/Hero'
 import { About } from './components/About/About'
 import { Team } from './components/Team/Team'
+import  Partner from './components/Partner/Partner'
 import { Projects } from './components/Projects/Projects'
 import { CompletedProjects } from './components/Projects/CompletedProjects'
 import { Footer } from './components/Footer/Footer'
@@ -19,6 +20,7 @@ import { AllProjectsPage } from './pages/AllProjectsPage'
 import { AllUpcomingProjectsPage } from './pages/AllUpcomingProjectsPage'
 import AdminLogin from "./Admin/AdminLogin"
 import AdminDashboard from "./Admin/AdminDashboard"
+import Partners from './components/Partner/Partner'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -235,6 +237,7 @@ function App() {
               <Team />
               <Projects />
               <CompletedProjects />
+              <Partners />
               <Footer />
             </div>
 

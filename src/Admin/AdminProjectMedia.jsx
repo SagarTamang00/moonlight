@@ -4,226 +4,309 @@ import useProjects from "../hooks/useProjects";
 import useProjectMedia from "../hooks/useProjectMedia";
 
 import {
-    addProjectMedia,
-    deleteProjectMedia
+  addProjectMedia,
+  deleteProjectMedia,
 } from "../api/projectMediaApi";
 
-
 const AdminProjectMedia = () => {
+  const { projects } = useProjects();
 
-    const { projects } = useProjects();
+  const [selectedProject, setSelectedProject] =
+    useState("");
 
-    const [selectedProject, setSelectedProject] = useState("");
+  const { media, loading } =
+    useProjectMedia(selectedProject);
 
-    const { media, loading } = useProjectMedia(selectedProject);
+  const [formData, setFormData] = useState({
+    project_id: "",
+    type: "",
+    media_url: "",
+    title: "",
+  });
 
-
-    const [formData, setFormData] = useState({
-        project_id: "",
-        type: "",
-        media_url: "",
-        title: ""
+  // HANDLE INPUT
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
+  };
 
+  // HANDLE PROJECT SELECT
+  const handleProjectSelect = (e) => {
+    const projectId = e.target.value;
 
-    // HANDLE INPUT
-    const handleChange = (e) => {
+    setSelectedProject(projectId);
 
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    setFormData({
+      ...formData,
+      project_id: projectId,
+    });
+  };
 
+  // ADD MEDIA
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // HANDLE PROJECT SELECT
-    const handleProjectSelect = (e) => {
+    try {
 
-        const projectId = e.target.value;
+      await addProjectMedia(formData);
 
-        setSelectedProject(projectId);
+      alert("Media added successfully");
 
-        setFormData({
-            ...formData,
-            project_id: projectId
-        });
-    };
+      window.location.reload();
 
+    } catch (err) {
 
-    // ADD MEDIA
-    const handleSubmit = async (e) => {
+      console.log(err);
 
-        e.preventDefault();
+      alert("Failed to add media");
+    }
+  };
 
-        try {
+  // DELETE MEDIA
+  const handleDelete = async (id) => {
 
-            await addProjectMedia(formData);
+    const confirmDelete = window.confirm(
+      "Delete this media?"
+    );
 
-            alert("Media added successfully");
+    if (!confirmDelete) return;
 
-            window.location.reload();
+    try {
 
-        } catch (err) {
+      await deleteProjectMedia(id);
 
-            console.log(err);
+      alert("Media deleted successfully");
 
-            alert("Failed to add media");
-        }
-    };
+      window.location.reload();
 
+    } catch (err) {
 
-    // DELETE MEDIA
-    const handleDelete = async (id) => {
+      console.log(err);
 
-        const confirmDelete = window.confirm(
-            "Delete this media?"
-        );
+      alert("Failed to delete media");
+    }
+  };
 
-        if (!confirmDelete) return;
+  return (
+    <div className="min-h-screen bg-white dark:bg-black p-6 md:p-10 transition-all duration-300">
 
-        try {
+      {/* HEADER */}
+      <div className="mb-10">
 
-            await deleteProjectMedia(id);
+        <h2
+          style={{ fontFamily: "'Syne', sans-serif" }}
+          className="text-3xl font-bold text-black dark:text-white"
+        >
+          Project Media
+        </h2>
 
-            alert("Media deleted successfully");
+        <p className="text-gray-500 mt-2">
+          Manage images, videos and behind the scenes content.
+        </p>
 
-            window.location.reload();
+      </div>
 
-        } catch (err) {
+      {/* SELECT PROJECT */}
+      <div className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-8">
 
-            console.log(err);
+        <label className="block text-sm font-medium text-black dark:text-white mb-3">
+          Select Project
+        </label>
 
-            alert("Failed to delete media");
-        }
-    };
+        <select
+          value={selectedProject}
+          onChange={handleProjectSelect}
+          className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+        >
 
+          <option value="">
+            Select Project
+          </option>
 
-    return (
-        <div>
+          {projects.map((project) => (
 
-            <h2>Project Media Admin</h2>
+            <option
+              key={project.id}
+              value={project.id}
+            >
+              {project.title}
+            </option>
+          ))}
+        </select>
+      </div>
 
+      {/* ADD MEDIA FORM */}
+      <div className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10">
 
-            {/* SELECT PROJECT */}
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-5"
+        >
+
+          {/* TYPE */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Media Type
+            </label>
+
             <select
-                value={selectedProject}
-                onChange={handleProjectSelect}
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             >
 
-                <option value="">
-                    Select Project
-                </option>
+              <option value="">
+                Select Media Type
+              </option>
 
-                {projects.map((project) => (
+              <option value="image">
+                Image
+              </option>
 
-                    <option
-                        key={project.id}
-                        value={project.id}
-                    >
-                        {project.title}
-                    </option>
-                ))}
+              <option value="video">
+                Video
+              </option>
+
+              <option value="bts">
+                Behind The Scenes
+              </option>
 
             </select>
+          </div>
 
+          {/* TITLE */}
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Media Title
+            </label>
 
-            {/* ADD MEDIA FORM */}
-            <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="title"
+              placeholder="Enter media title"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
+
+          {/* MEDIA URL */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Media URL
+            </label>
+
+            <input
+              type="text"
+              name="media_url"
+              placeholder="https://example.com/media"
+              value={formData.media_url}
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
+            />
+          </div>
+
+          {/* BUTTON */}
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              className="h-12 px-6 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-medium hover:scale-[1.02] transition-all duration-300"
+            >
+              Add Media
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      {/* MEDIA LIST */}
+      <div>
+
+        {loading ? (
+
+          <div className="text-black dark:text-white">
+            Loading...
+          </div>
+
+        ) : media.length === 0 ? (
+
+          <div className="bg-[#f8f8f8] dark:bg-[#111111] border border-[#ececec] dark:border-[#222222] rounded-3xl p-10 text-center">
+
+            <p className="text-gray-500">
+              No media found for this project.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            {media.map((item) => (
+
+              <div
+                key={item.id}
+                className="bg-[#f8f8f8] dark:bg-[#111111] border border-[#ececec] dark:border-[#222222] rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1"
+              >
 
                 {/* TYPE */}
-                <select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                >
+                <div className="mb-4">
 
-                    <option value="">
-                        Select Media Type
-                    </option>
+                  <span className="inline-flex items-center px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-sm font-medium capitalize">
+                    {item.type}
+                  </span>
 
-                    <option value="image">
-                        Image
-                    </option>
-
-                    <option value="video">
-                        Video
-                    </option>
-
-                    <option value="bts">
-                        Behind The Scenes
-                    </option>
-
-                </select>
-
-
-                {/* MEDIA URL */}
-                <input
-                    type="text"
-                    name="media_url"
-                    placeholder="Media URL"
-                    value={formData.media_url}
-                    onChange={handleChange}
-                    required
-                />
-
+                </div>
 
                 {/* TITLE */}
-                <input
-                    type="text"
-                    name="title"
-                    placeholder="Media Title"
-                    value={formData.title}
-                    onChange={handleChange}
-                />
+                <h3 className="text-xl font-semibold text-black dark:text-white mb-3">
+                  {item.title || "Untitled Media"}
+                </h3>
 
+                {/* URL */}
+                <a
+                  href={item.media_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-sm text-gray-600 dark:text-gray-400 break-all hover:text-black dark:hover:text-white transition-all mb-6"
+                >
+                  {item.media_url}
+                </a>
 
-                <button type="submit">
-                    Add Media
-                </button>
+                {/* ACTIONS */}
+                <div className="flex items-center gap-3">
 
-            </form>
+                  <a
+                    href={item.media_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 h-11 rounded-2xl border border-black dark:border-white text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 flex items-center justify-center"
+                  >
+                    Open
+                  </a>
 
+                  <button
+                    onClick={() =>
+                      handleDelete(item.id)
+                    }
+                    className="flex-1 h-11 rounded-2xl bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-all duration-300"
+                  >
+                    Delete
+                  </button>
 
-            {/* MEDIA LIST */}
-            <div>
-
-                {loading ? (
-
-                    <p>Loading...</p>
-
-                ) : (
-
-                    media.map((item) => (
-
-                        <div key={item.id}>
-
-                            <p>{item.type}</p>
-
-                            <p>{item.title}</p>
-
-                            <a
-                                href={item.media_url}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                Open Media
-                            </a>
-
-                            <button
-                                onClick={() => handleDelete(item.id)}
-                            >
-                                Delete
-                            </button>
-
-                        </div>
-                    ))
-                )}
-
-            </div>
-
-        </div>
-    );
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default AdminProjectMedia;
