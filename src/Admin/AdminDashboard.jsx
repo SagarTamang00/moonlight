@@ -1,14 +1,19 @@
 import { useState } from "react";
 import AdminSettings from "./AdminSettings";
-import useSettings from "../hooks/useSettings";
 import AdminSocialLinks from "./AdminSocialLinks";
+import AdminTeam from "./AdminTeam";
+import useSettings from "../hooks/useSettings";
+import useDarkMode from "../hooks/useDarkMode";
+import { BASE_URL } from "../utils/api";
+
 const NAV = [
   {
     grp: "Main",
     items: [
       { icon: "ti-layout-dashboard", label: "Dashboard" },
+      { icon: "ti-settings", label: "Settings" },
       { icon: "ti-users", label: "Team" },
-      { icon: "ti-briefcase", label: "Works" },
+      { icon: "ti-link", label: "Social Links" },
     ],
   },
 ];
@@ -72,19 +77,20 @@ function Card({ children, className = "" }) {
 }
 
 export default function AdminDashboard() {
-  const [dark, setDark] = useState(false);
+  const [colorTheme, setTheme] = useDarkMode();
+  const dark = colorTheme === "light";
+
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const { settings } = useSettings();
 
   return (
     <div
-      className={dark ? "dark" : ""}
       style={{ fontFamily: "'Outfit', sans-serif" }}
     >
 
-      <div className="flex h-screen overflow-hidden bg-[#f6f6f7] dark:bg-[#111111] transition-all duration-300">
+      <div className="flex min-h-screen bg-[#f6f6f7] dark:bg-[#111111] transition-all duration-300">
 
         {/* MOBILE OVERLAY */}
         {sidebarOpen && (
@@ -97,49 +103,43 @@ export default function AdminDashboard() {
         {/* SIDEBAR */}
         <aside
           className={`
-            fixed lg:relative z-50 lg:z-0
-            top-0 left-0 h-full
+            fixed lg:sticky z-50 lg:z-0
+            top-0 left-0 h-[100dvh]
             w-[260px] min-w-[260px]
-            bg-[#111111] dark:bg-[#0d0d0d]
-            border-r border-[#232323]
+            bg-white dark:bg-[#0d0d0d]
+            border-r border-gray-200 dark:border-[#232323]
             flex flex-col
             transition-transform duration-300
-            ${
-              sidebarOpen
-                ? "translate-x-0"
-                : "-translate-x-full lg:translate-x-0"
+            ${sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0"
             }
           `}
         >
           {/* Logo */}
-          <div className="px-6 py-6 border-b border-[#232323]">
+          <div className="px-6 py-6 border-b border-gray-200 dark:border-[#232323]">
             <div className="flex items-center justify-between">
 
               <div className="flex items-center gap-3">
                 {/* Logo Image OR fallback */}
-            <div className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center overflow-hidden">
-
-                {settings?.logo ? (
+                <div className="w-11 h-11 rounded-2xl bg-black dark:bg-white flex items-center justify-center overflow-hidden">
+                  {settings?.logo ? (
                     <img
-                        src={`http://localhost:5000${settings.logo}`}
-                        alt="logo"
-                        className="w-full h-full object-cover"
+                      src={`${BASE_URL}${settings.logo}`}
+                      alt="logo"
+                      className="w-full h-full object-cover"
                     />
-                ) : (
-                    <span className="text-black font-bold text-lg">
-                        M
+                  ) : (
+                    <span className="text-white dark:text-black font-bold text-lg">
+                      M
                     </span>
-                )}
-
-            </div>
-                <div className="w-11 h-11 rounded-2xl bg-white text-black flex items-center justify-center font-bold text-lg">
-                  M
+                  )}
                 </div>
 
                 <div>
                   <h1
                     style={{ fontFamily: "'Syne', sans-serif" }}
-                    className="text-white text-[18px] font-bold"
+                    className="text-black dark:text-white text-[18px] font-bold"
                   >
                     MoonLight
                   </h1>
@@ -153,9 +153,11 @@ export default function AdminDashboard() {
               {/* Close button mobile */}
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="lg:hidden text-white text-xl"
+                className="lg:hidden text-black dark:text-white text-xl"
               >
-                <i className="ti ti-x" />
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
           </div>
@@ -164,9 +166,6 @@ export default function AdminDashboard() {
           <nav className="flex-1 px-4 py-6 overflow-y-auto">
             {NAV.map((section) => (
               <div key={section.grp}>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 mb-4 px-2">
-                  {section.grp}
-                </p>
 
                 <div className="space-y-2">
                   {section.items.map((item) => {
@@ -180,11 +179,10 @@ export default function AdminDashboard() {
                           setSidebarOpen(false);
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200
-                        ${
-                          isActive
-                            ? "bg-white text-black shadow-lg"
-                            : "text-gray-400 hover:bg-[#1c1c1c] hover:text-white"
-                        }`}
+                        ${isActive
+                            ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
+                            : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1c1c1c] hover:text-black dark:hover:text-white"
+                          }`}
                       >
                         <i className={`ti ${item.icon} text-lg`} />
 
@@ -200,14 +198,14 @@ export default function AdminDashboard() {
           </nav>
 
           {/* User */}
-          <div className="p-4 border-t border-[#232323]">
-            <div className="flex items-center gap-3 bg-[#181818] rounded-2xl p-3">
-              <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-semibold">
+          <div className="p-4 border-t border-gray-200 dark:border-[#232323]">
+            <div className="flex items-center gap-3 bg-gray-50 dark:bg-[#181818] rounded-2xl p-3">
+              <div className="w-10 h-10 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-semibold">
                 A
               </div>
 
               <div>
-                <p className="text-white text-sm font-medium">
+                <p className="text-black dark:text-white text-sm font-medium">
                   Admin
                 </p>
 
@@ -218,15 +216,12 @@ export default function AdminDashboard() {
             </div>
           </div>
         </aside>
-        <div>
-            <h1>Admin Dashboard</h1>            
-        </div>
 
         {/* MAIN */}
-        <main className="flex-1 flex flex-col overflow-hidden w-full">
+        <main className="flex-1 flex flex-col w-full min-w-0">
 
           {/* TOPBAR */}
-          <div className="h-auto min-h-[72px] bg-white dark:bg-[#181818] border-b border-[#ececec] dark:border-[#2a2a2a] px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-all duration-300">
+          <div className="sticky top-0 z-40 h-[72px] bg-white/80 dark:bg-[#181818]/80 backdrop-blur-md border-b border-[#ececec] dark:border-[#2a2a2a] px-4 sm:px-6 flex items-center justify-between gap-4 transition-all duration-300">
 
             {/* LEFT */}
             <div className="flex items-center gap-4">
@@ -236,7 +231,9 @@ export default function AdminDashboard() {
                 onClick={() => setSidebarOpen(true)}
                 className="lg:hidden w-11 h-11 rounded-2xl bg-black text-white flex items-center justify-center"
               >
-                <i className="ti ti-menu-2 text-xl" />
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
 
               <div>
@@ -247,134 +244,39 @@ export default function AdminDashboard() {
                   Dashboard
                 </h1>
 
-                <p className="text-sm text-gray-500">
-                  Welcome back, Admin
-                </p>
               </div>
             </div>
 
             {/* RIGHT */}
             <button
-              onClick={() => setDark(!dark)}
-              className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-black text-white dark:bg-white dark:text-black transition-all duration-300 w-full sm:w-auto"
+              onClick={() => setTheme(colorTheme)}
+              className="flex items-center justify-center gap-2 w-11 h-11 rounded-2xl bg-black text-white dark:bg-white dark:text-black transition-all duration-300 flex-shrink-0"
             >
-              <i className={`ti ${dark ? "ti-sun" : "ti-moon"}`} />
-
-              {dark ? "Light Mode" : "Dark Mode"}
+              {dark ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                </svg>
+              )}
+              {/* {dark ? "Light Mode" : "Dark Mode"} */}
             </button>
           </div>
 
-          {/* CONTENT */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-
-            {/* STATS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              {STATS.map((item) => (
-                <Card key={item.label} className="p-5 sm:p-6">
-
-                  <p className="text-sm text-gray-500 mb-2">
-                    {item.label}
-                  </p>
-
-                  <h2
-                    style={{ fontFamily: "'Syne', sans-serif" }}
-                    className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-2 break-words"
-                  >
-                    {item.value}
-                  </h2>
-
-                  <div
-                    className={`text-sm font-medium ${
-                      item.up
-                        ? "text-green-600"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {item.delta} this month
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {/* TEAM + WORKS */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-
-              {/* TEAM */}
-              <Card>
-                <div className="p-5 sm:p-6 border-b border-[#ececec] dark:border-[#2a2a2a]">
-                  <h2
-                    style={{ fontFamily: "'Syne', sans-serif" }}
-                    className="text-xl font-bold text-black dark:text-white"
-                  >
-                    Team
-                  </h2>
-                </div>
-
-                <div className="p-5 sm:p-6 space-y-4">
-                  {TEAM.map((member) => (
-                    <div
-                      key={member.name}
-                      className="flex items-center gap-4 p-4 rounded-2xl bg-[#f8f8f8] dark:bg-[#202020]"
-                    >
-                      <div className="w-12 h-12 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-semibold flex-shrink-0">
-                        {member.name.charAt(0)}
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="font-medium text-black dark:text-white truncate">
-                          {member.name}
-                        </p>
-
-                        <p className="text-sm text-gray-500 truncate">
-                          {member.role}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* WORKS */}
-              <Card>
-                <div className="p-5 sm:p-6 border-b border-[#ececec] dark:border-[#2a2a2a]">
-                  <h2
-                    style={{ fontFamily: "'Syne', sans-serif" }}
-                    className="text-xl font-bold text-black dark:text-white"
-                  >
-                    Works
-                  </h2>
-                </div>
-
-                <div className="p-5 sm:p-6 space-y-4">
-                  {WORKS.map((work) => (
-                    <div
-                      key={work.title}
-                      className="p-4 rounded-2xl bg-[#f8f8f8] dark:bg-[#202020]"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
-                        <div className="min-w-0">
-                          <p className="font-medium text-black dark:text-white truncate">
-                            {work.title}
-                          </p>
-
-                          <p className="text-sm text-gray-500 truncate">
-                            {work.client}
-                          </p>
-                        </div>
-
-                        <span
-                          className={`text-xs px-3 py-1 rounded-full font-medium w-fit ${BADGE[work.status]}`}
-                        >
-                          {work.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
+          {/* CONTENT AREA */}
+          <div className="flex-1 bg-white dark:bg-black w-full relative">
+            {activeNav === "Settings" && <AdminSettings />}
+            {activeNav === "Team" && <AdminTeam />}
+            {activeNav === "Social Links" && <AdminSocialLinks />}
+            {activeNav === "Dashboard" && (
+              <div className="p-8">
+                <h2 className="text-2xl font-bold text-black dark:text-white mb-4">Welcome to Admin Dashboard</h2>
+              </div>
+            )}
           </div>
+
         </main>
       </div>
     </div>

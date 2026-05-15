@@ -5,10 +5,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-export const LenisWrapper = ({ children }) => {
+export const LenisWrapper = ({ children, disabled = false }) => {
   const lenisRef = useRef()
 
   useEffect(() => {
+    if (disabled) return;
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -35,7 +37,7 @@ export const LenisWrapper = ({ children }) => {
     return () => {
       lenis.destroy()
     }
-  }, [])
+  }, [disabled])
 
   return <>{children}</>
 }

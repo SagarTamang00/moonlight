@@ -2,11 +2,13 @@ import React, { useRef, useState, useEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import useSettings from '../../hooks/useSettings'
 
 gsap.registerPlugin(ScrollTrigger)
 
 export const About = () => {
   const sectionRef = useRef(null)
+  const { settings } = useSettings()
   // Removed modal scroll lock as we display content inline
 
   useGSAP(() => {
@@ -53,10 +55,8 @@ export const About = () => {
         <h2 className="text-4xl sm:text-5xl md:text-7xl font-cinematic mb-6 lg:mb-8 text-white opacity-0 about-title transform translate-y-8 [text-shadow:_0_2px_10px_rgb(0_0_0_/_80%)] tracking-wider">
           ABOUT US
         </h2>
-        <p className="max-w-3xl text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed text-gray-100 opacity-0 about-text transform translate-y-8 [text-shadow:_0_2px_4px_rgb(0_0_0_/_80%)]">
-          Moonlight Motion Pictures is a Kathmandu-based film production company focused on creating engaging and high-quality cinematic content. We are passionate about storytelling and committed to bringing fresh ideas, new talent, and creative vision to the Nepali film industry.
-
-          From concept to screen, we aim to produce films that entertain, inspire, and connect with audiences everywhere.
+        <p className="max-w-3xl text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed text-gray-100 opacity-0 about-text transform translate-y-8 [text-shadow:_0_2px_4px_rgb(0_0_0_/_80%)] whitespace-pre-wrap">
+          {settings?.about_description || 'Moonlight Motion Pictures is a Kathmandu-based film production company focused on creating engaging and high-quality cinematic content. We are passionate about storytelling and committed to bringing fresh ideas, new talent, and creative vision to the Nepali film industry.\n\nFrom concept to screen, we aim to produce films that entertain, inspire, and connect with audiences everywhere.'}
         </p>
 
         {/* Counters */}

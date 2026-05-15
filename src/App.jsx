@@ -14,7 +14,7 @@ import { Projects } from './components/Projects/Projects'
 import { CompletedProjects } from './components/Projects/CompletedProjects'
 import { Footer } from './components/Footer/Footer'
 import { Header } from './components/Header/Header'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { AllProjectsPage } from './pages/AllProjectsPage'
 import { AllUpcomingProjectsPage } from './pages/AllUpcomingProjectsPage'
 import AdminLogin from "./Admin/AdminLogin"
@@ -29,6 +29,9 @@ function App() {
   const spotlightRef = useRef(null)
   const [moonReady, setMoonReady] = useState(false)
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight })
+  const location = useLocation()
+
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   // Calculate dynamic FOV to maintain constant horizontal scale
   // This prevents the moon from shrinking ("going backward") when DevTools open
@@ -122,8 +125,6 @@ function App() {
       ease: 'none'
     }, 0)
 
-    // Removed About tooltip fade in
-
     // === SATELLITE SPOTLIGHT: Focus on About section ===
     if (spotlightRef.current?.light) {
       const light = spotlightRef.current.light
@@ -153,8 +154,6 @@ function App() {
       duration: 1,
       ease: 'power1.inOut'
     }, 1)
-
-    // Removed About tooltip fade out
 
     // === SATELLITE SPOTLIGHT: Sweep to Team section ===
     if (spotlightRef.current?.light) {
@@ -211,7 +210,7 @@ function App() {
   }, { scope: containerRef, dependencies: [moonReady, windowSize.width] })
 
   return (
-    <LenisWrapper>
+    <LenisWrapper disabled={isAdminRoute}>
       <Routes>
         <Route path="/" element={
           <div ref={containerRef} className="relative w-full text-moon-white bg-moon-black min-h-screen">
@@ -244,7 +243,7 @@ function App() {
         <Route path="/all-projects" element={<AllProjectsPage />} />
         <Route path="/upcoming-projects" element={<AllUpcomingProjectsPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
 
       </Routes>
     </LenisWrapper>
