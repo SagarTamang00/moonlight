@@ -95,13 +95,13 @@ const AdminSettings = () => {
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-10 relative">
-            <PopupModal 
-                {...modal} 
-                onCancel={closeModal} 
+            <PopupModal
+                {...modal}
+                onCancel={closeModal}
                 onConfirm={() => {
                     if (modal.onConfirm) modal.onConfirm();
                     else closeModal();
-                }} 
+                }}
             />
 
             {/* Page title */}
@@ -182,11 +182,6 @@ const AdminSettings = () => {
                                 src={getEmbedUrl(form.google_maps_link)}
                                 width="100%"
                                 height="100%"
-                                style={{
-                                    border: 0,
-                                    filter: 'grayscale(1) invert(0.9) contrast(0.85)',
-                                    opacity: 0.8,
-                                }}
                                 allowFullScreen=""
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
