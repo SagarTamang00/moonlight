@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { AuditionModal } from './AuditionModal'
+import { Collaboration } from './Collaboration'
 
 export const Header = () => {
   const [isMuted, setIsMuted] = useState(true)
@@ -59,7 +59,7 @@ export const Header = () => {
         </button>
       </header>
 
-      <AuditionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      < Collaboration isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   )
 }

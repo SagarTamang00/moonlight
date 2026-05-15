@@ -5,19 +5,28 @@ import PopupModal from "./PopupModal";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
   const [loading, setLoading] = useState(false);
 
-  const [modal, setModal] = useState({ isOpen: false, type: "alert", title: "", message: "", onConfirm: null });
+  const [modal, setModal] = useState({
+    isOpen: false,
+    type: "alert",
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
 
   const showModal = (type, title, message, onConfirm = null) => {
-      setModal({ isOpen: true, type, title, message, onConfirm });
+    setModal({ isOpen: true, type, title, message, onConfirm });
   };
 
-  const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
+  const closeModal = () =>
+    setModal((prev) => ({ ...prev, isOpen: false }));
 
   const handleChange = (e) => {
     setFormData({
@@ -32,28 +41,48 @@ const AdminLogin = () => {
 
     try {
       const res = await API.post("/admin/login", formData);
-      localStorage.setItem("token", res.data.token);
-      navigate("/admin-dashboard");
+
+      const token = res.data.token;
+
+      // 1. Save token
+      localStorage.setItem("token", token);
+
+      // 2. (Optional but good) verify token immediately
+      await API.get("/admin/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 3. Navigate only after success
+      navigate("/admin/dashboard");
+
     } catch (error) {
       console.log(error);
-      showModal("alert", "Authentication Error", "Login Failed. Please check your credentials.");
+
+      localStorage.removeItem("token");
+
+      showModal(
+        "alert",
+        "Authentication Error",
+        "Login failed. Please check your credentials."
+      );
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black font-mono px-4 transition-colors duration-300 relative">
-      <PopupModal 
-          {...modal} 
-          onCancel={closeModal} 
-          onConfirm={() => {
-              if (modal.onConfirm) modal.onConfirm();
-              else closeModal();
-          }} 
+      <PopupModal
+        {...modal}
+        onCancel={closeModal}
+        onConfirm={() => {
+          if (modal.onConfirm) modal.onConfirm();
+          else closeModal();
+        }}
       />
       <div className="w-full max-w-md">
-        
+
         {/* Header */}
         <div className="mb-16 text-center">
           <div className="w-16 h-16 bg-black dark:bg-white text-white dark:text-black flex items-center justify-center rounded-2xl mx-auto mb-8 transition-colors duration-300">
@@ -116,9 +145,9 @@ const AdminLogin = () => {
         </form>
 
         <div className="mt-16 text-center">
-            <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-300 dark:text-neutral-700">
-              MoonLight Admin Panel • v1.0
-            </p>
+          <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-300 dark:text-neutral-700">
+            MoonLight Admin Panel • v1.0
+          </p>
         </div>
       </div>
     </div>

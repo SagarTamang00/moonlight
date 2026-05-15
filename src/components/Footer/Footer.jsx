@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react'
+import News from "../News/News"
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import useSocialLinks from '../../hooks/useSocialLinks'
 import useSettings from '../../hooks/useSettings'
-
 gsap.registerPlugin(ScrollTrigger)
 
 const SOCIALS = ['IG', 'X', 'YT', 'VIMEO']
@@ -145,27 +145,21 @@ export const Footer = () => {
             © {new Date().getFullYear()} Moonlight Motion Pictures
           </p>
 
-          {/* Newsletter */}
-          {submitted ? (
-            <p className="text-[11px] tracking-widest text-white/55">You're on the list ✓</p>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex gap-3 border-b border-white/30 pb-1.5 focus-within:border-white/60 transition-colors duration-300">
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                className="bg-transparent text-[12px] text-white/75 placeholder-white/35 outline-none w-44"
-              />
-              <button
-                type="submit"
-                className="text-[10px] tracking-[0.25em] uppercase text-white/55 hover:text-white transition-colors duration-200"
-              >
-                Join →
-              </button>
-            </form>
-          )}
+          {/* News & Blog Button */}
+          <a
+            href="/news"
+            className="group relative overflow-hidden rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 transition-all duration-500 hover:border-white/30 hover:bg-white hover:text-black"
+          >
+            <span className="relative z-10 flex items-center gap-3 text-[11px] tracking-[0.28em] uppercase text-white group-hover:text-black transition-colors duration-300">
+              News & Blog
+              <span className="transition-transform duration-300 group-hover:translate-x-1">
+                ↗
+              </span>
+            </span>
 
+            {/* Glow Effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-white/20 via-white/5 to-white/20" />
+          </a>
           {/* Socials */}
           <div className="flex items-center gap-5">
             {links && links.length > 0 ? (

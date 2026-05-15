@@ -10,7 +10,8 @@ import { Moon3D } from './components/Moon/Moon3D'
 import { Hero } from './components/Hero/Hero'
 import { About } from './components/About/About'
 import { Team } from './components/Team/Team'
-import  Partner from './components/Partner/Partner'
+import Partners from './components/Partner/Partner'
+import News from './components/News/News'
 import { Projects } from './components/Projects/Projects'
 import { CompletedProjects } from './components/Projects/CompletedProjects'
 import { Footer } from './components/Footer/Footer'
@@ -20,7 +21,10 @@ import { AllProjectsPage } from './pages/AllProjectsPage'
 import { AllUpcomingProjectsPage } from './pages/AllUpcomingProjectsPage'
 import AdminLogin from "./Admin/AdminLogin"
 import AdminDashboard from "./Admin/AdminDashboard"
-import Partners from './components/Partner/Partner'
+import AuditionModal from './components/Audition/AuditionModal'
+import { Collaboration } from './components/Header/Collaboration'
+import AuditionApply from "./pages/AuditionApply";
+
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -231,6 +235,8 @@ function App() {
 
             {/* HTML Content Overlay */}
             <div className="relative z-10 w-full flex flex-col">
+              <AuditionModal />
+
               <Header />
               <Hero gapRef={gapRef} />
               <About />
@@ -243,10 +249,16 @@ function App() {
 
           </div>
         } />
+        <Route
+          path="/audition"
+          element={<AuditionApply />}
+        />
+        <Route path="/news" element={<News />} />
+
         <Route path="/all-projects" element={<AllProjectsPage />} />
         <Route path="/upcoming-projects" element={<AllUpcomingProjectsPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
       </Routes>
     </LenisWrapper>

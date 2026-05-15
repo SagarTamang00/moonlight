@@ -15,7 +15,7 @@ const checkAuthAndRedirect = async (navigate) => {
             },
         });
 
-        navigate("/admin/dashboard");
+        return true;
     } catch (error) {
         localStorage.removeItem("token");
         navigate("/admin/login");

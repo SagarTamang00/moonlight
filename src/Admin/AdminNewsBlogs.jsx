@@ -3,6 +3,7 @@ import useNewsBlogs from "../hooks/useNewsBlogs";
 
 import {
   createNewsBlog,
+  updateNewsBlog,
   deleteNewsBlog,
 } from "../api/newsBlogApi";
 
@@ -17,6 +18,9 @@ const AdminNewsBlogs = () => {
 
   const [poster, setPoster] = useState(null);
 
+  // EDIT STATE
+  const [editId, setEditId] = useState(null);
+
   // HANDLE INPUT
   const handleChange = (e) => {
     setFormData({
@@ -25,7 +29,18 @@ const AdminNewsBlogs = () => {
     });
   };
 
-  // CREATE NEWS
+  // HANDLE EDIT
+  const handleEdit = (item) => {
+    setEditId(item.id);
+
+    setFormData({
+      title: item.title || "",
+      description: item.description || "",
+      news_link: item.news_link || "",
+    });
+  };
+
+  // CREATE / UPDATE NEWS
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -40,20 +55,44 @@ const AdminNewsBlogs = () => {
         data.append("news_poster", poster);
       }
 
-      await createNewsBlog(data);
+      // UPDATE
+      if (editId) {
 
-      alert("News created successfully");
+        await updateNewsBlog(editId, data);
+
+        alert("News updated successfully");
+
+      } else {
+
+        // CREATE
+        await createNewsBlog(data);
+
+        alert("News created successfully");
+      }
+
+      // RESET FORM
+      setFormData({
+        title: "",
+        description: "",
+        news_link: "",
+      });
+
+      setPoster(null);
+      setEditId(null);
 
       window.location.reload();
+
     } catch (err) {
+
       console.log(err);
 
-      alert("Failed to create news");
+      alert("Operation failed");
     }
   };
 
   // DELETE NEWS
   const handleDelete = async (id) => {
+
     const confirmDelete = window.confirm(
       "Delete this news?"
     );
@@ -61,12 +100,15 @@ const AdminNewsBlogs = () => {
     if (!confirmDelete) return;
 
     try {
+
       await deleteNewsBlog(id);
 
       alert("News deleted successfully");
 
       window.location.reload();
+
     } catch (err) {
+
       console.log(err);
 
       alert("Failed to delete news");
@@ -83,9 +125,10 @@ const AdminNewsBlogs = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black p-6 md:p-10 transition-all duration-300">
-      
+
       {/* HEADER */}
       <div className="mb-10">
+
         <h2
           style={{ fontFamily: "'Syne', sans-serif" }}
           className="text-3xl font-bold text-black dark:text-white"
@@ -96,9 +139,10 @@ const AdminNewsBlogs = () => {
         <p className="text-gray-500 mt-2">
           Create and manage news articles and blog posts.
         </p>
+
       </div>
 
-      {/* CREATE FORM */}
+      {/* FORM */}
       <div className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10">
 
         <form
@@ -108,6 +152,7 @@ const AdminNewsBlogs = () => {
 
           {/* TITLE */}
           <div>
+
             <label className="block text-sm font-medium text-black dark:text-white mb-2">
               Title
             </label>
@@ -121,10 +166,12 @@ const AdminNewsBlogs = () => {
               required
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             />
+
           </div>
 
           {/* DESCRIPTION */}
           <div>
+
             <label className="block text-sm font-medium text-black dark:text-white mb-2">
               Description
             </label>
@@ -137,10 +184,12 @@ const AdminNewsBlogs = () => {
               rows={5}
               className="w-full px-4 py-3 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all resize-none"
             />
+
           </div>
 
           {/* LINK */}
           <div>
+
             <label className="block text-sm font-medium text-black dark:text-white mb-2">
               External Link
             </label>
@@ -153,10 +202,12 @@ const AdminNewsBlogs = () => {
               onChange={handleChange}
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             />
+
           </div>
 
           {/* FILE */}
           <div>
+
             <label className="block text-sm font-medium text-black dark:text-white mb-2">
               Poster Image
             </label>
@@ -169,6 +220,7 @@ const AdminNewsBlogs = () => {
               }
               className="block w-full text-sm text-gray-600 dark:text-gray-300"
             />
+
           </div>
 
           {/* BUTTON */}
@@ -176,8 +228,9 @@ const AdminNewsBlogs = () => {
             type="submit"
             className="h-12 px-6 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-medium hover:scale-[1.02] transition-all duration-300"
           >
-            Create News
+            {editId ? "Update News" : "Create News"}
           </button>
+
         </form>
       </div>
 
@@ -185,6 +238,7 @@ const AdminNewsBlogs = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
         {news.map((item) => (
+
           <div
             key={item.id}
             className="bg-[#f8f8f8] dark:bg-[#111111] border border-[#ececec] dark:border-[#222222] rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -211,7 +265,7 @@ const AdminNewsBlogs = () => {
               </p>
 
               {/* ACTIONS */}
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
 
                 {item.news_link ? (
                   <a
@@ -226,18 +280,30 @@ const AdminNewsBlogs = () => {
                   <div />
                 )}
 
-                <button
-                  onClick={() =>
-                    handleDelete(item.id)
-                  }
-                  className="h-11 px-5 rounded-2xl bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-all duration-300"
-                >
-                  Delete
-                </button>
+                <div className="flex gap-3">
+
+                  {/* EDIT */}
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="h-11 px-5 rounded-2xl border border-black dark:border-white text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300"
+                  >
+                    Edit
+                  </button>
+
+                  {/* DELETE */}
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="h-11 px-5 rounded-2xl bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-all duration-300"
+                  >
+                    Delete
+                  </button>
+
+                </div>
 
               </div>
             </div>
           </div>
+
         ))}
       </div>
     </div>

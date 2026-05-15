@@ -12,6 +12,8 @@ import AdminProjectCategories from "./AdminProjectCategories";
 import AdminProjectLinks from "./AdminProjectLinks";
 import AdminProjectMedia from "./AdminProjectMedia";
 import { BASE_URL } from "../utils/api";
+import checkAuthAndRedirect from "../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 const NAV = [
   {
@@ -92,6 +94,8 @@ function Card({ children, className = "" }) {
 }
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
   const [colorTheme, setTheme] = useDarkMode();
   const dark = colorTheme === "light";
 
@@ -99,6 +103,10 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { settings } = useSettings();
+
+  // useEffect(() => {
+  //   checkAuthAndRedirect(navigate);
+  // }, []);
 
   return (
     <div
@@ -216,6 +224,35 @@ export default function AdminDashboard() {
               <div className="w-10 h-10 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-semibold">
                 A
               </div>
+              <button
+                onClick={() => {
+
+                  // CLEAR TOKEN
+                  localStorage.removeItem("token");
+
+                  // OPTIONAL: clear everything
+                  // localStorage.clear();
+
+                  // REDIRECT
+                  window.location.href = "/";
+                }}
+                className="
+    w-full
+    h-11
+    rounded-2xl
+    bg-black
+    dark:bg-white
+    text-white
+    dark:text-black
+    text-sm
+    font-medium
+    hover:opacity-80
+    transition-all
+    duration-300
+  "
+              >
+                Logout
+              </button>
 
               <div>
                 <p className="text-black dark:text-white text-sm font-medium">
@@ -297,6 +334,7 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
+
 
         </main>
       </div>
