@@ -23,3 +23,20 @@ const checkAuthAndRedirect = async (navigate) => {
 };
 
 export default checkAuthAndRedirect;
+
+// FORGOT PASSWORD
+export const forgotPassword = async (email) => {
+    return await API.post("/auth/forgot-password", { email });
+};
+
+
+// VERIFY TOKEN
+export const verifyToken = async (token) => {
+    return await API.post("/auth/verify-token", { token });
+};
+
+
+// RESET PASSWORD
+export const resetPassword = async (data) => {
+    return await API.post("/auth/reset-password", data);
+};
