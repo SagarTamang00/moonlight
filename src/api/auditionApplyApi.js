@@ -5,6 +5,13 @@ import API from "../utils/api";
 export const applyAudition = async (formData) => {
     return await API.post(
         "/auditions/apply",
-        formData
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        }
     );
 };
+
+

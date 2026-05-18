@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
 import useAuditions from "../../hooks/useAuditions";
+import { BASE_URL } from "../../utils/api";
 
 const AuditionModal = () => {
 
@@ -72,173 +73,184 @@ const AuditionModal = () => {
     }
 
     return (
-        <>
-            {/* OPEN BUTTON */}
-            {!open && (
+<div>
+    {/* OPEN BUTTON */}
+    {!open && (
+        <button
+            onClick={() => setOpen(true)}
+            className="
+                fixed
+                bottom-4
+                right-4
+                sm:bottom-6
+                sm:right-6
+                z-[999]
+                h-10
+                sm:h-11
+                px-4
+                sm:px-5
+                rounded-full
+                bg-white
+                text-black
+                text-[9px]
+                sm:text-[10px]
+                uppercase
+                tracking-[0.25em]
+                sm:tracking-[0.28em]
+                font-medium
+                hover:scale-105
+                transition-all
+                duration-300
+                shadow-2xl
+            "
+        >
+            Open Audition
+        </button>
+    )}
+
+    {/* MODAL */}
+    {open && (
+
+        <div
+            className="
+                fixed
+                inset-0
+                z-[99999]
+                flex
+                items-center
+                justify-center
+                bg-black/85
+                backdrop-blur-md
+                p-3
+                sm:p-4
+                overflow-y-auto
+            "
+        >
+
+            {/* CARD */}
+            <div
+                className="
+                    relative
+                    w-full
+                    max-w-md
+                    rounded-[28px]
+                    overflow-hidden
+                    border
+                    border-white/10
+                    bg-[#0d0d0d]
+                    shadow-[0_0_80px_rgba(255,255,255,0.08)]
+                    animate-[fadeIn_.4s_ease]
+                    my-auto
+                "
+            >
+
+                {/* CLOSE BUTTON */}
                 <button
-                    onClick={() => setOpen(true)}
+                    onClick={handleClose}
                     className="
-                        fixed
-                        bottom-6
-                        right-6
-                        z-[999]
-                        h-10
-                        px-5
+                        absolute
+                        top-3
+                        right-3
+                        sm:top-4
+                        sm:right-4
+                        z-30
+                        w-8
+                        h-8
                         rounded-full
-                        bg-white
-                        text-black
-                        text-[10px]
-                        uppercase
-                        tracking-[0.28em]
-                        font-medium
-                        hover:scale-105
-                        transition-all
-                        duration-300
-                        shadow-2xl
-                    "
-                >
-                    Open Audition
-                </button>
-            )}
-
-            {/* MODAL */}
-            {open && (
-
-                <div
-                    className="
-                        fixed
-                        inset-0
-                        z-[99999]
+                        bg-black/60
+                        border
+                        border-white/10
+                        text-white
                         flex
                         items-center
                         justify-center
-                        bg-black/85
-                        backdrop-blur-md
-                        px-4
-                        py-6
-                        overflow-hidden
-                        overscroll-none
-                        touch-none
+                        hover:bg-white
+                        hover:text-black
+                        transition-all
+                        duration-300
                     "
                 >
+                    <X size={15} />
+                </button>
 
-                    {/* CARD */}
-                    <div
+                {/* IMAGE */}
+                <div className="relative">
+
+                    <img
+                        src={`${BASE_URL}${activeAudition.audition_poster}`}
+                        alt="Audition Poster"
                         className="
-                            relative
                             w-full
-                            max-w-md
-                            rounded-3xl
-                            overflow-hidden
-                            border
-                            border-white/10
-                            bg-[#0d0d0d]
-                            shadow-[0_0_80px_rgba(255,255,255,0.08)]
-                            animate-[fadeIn_.4s_ease]
+                            h-[260px]
+                            xs:h-[320px]
+                            sm:h-[420px]
+                            object-contain
+                        "
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+                </div>
+
+                {/* CONTENT */}
+                <div className="p-4 sm:p-5">
+
+                    <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.38em] text-white/40 mb-3">
+                        Moonlight Motion Pictures
+                    </p>
+
+                    <h2
+                        className="
+                            text-white
+                            font-bold
+                            leading-tight
+                            mb-3
+                        "
+                        style={{
+                            fontSize: "clamp(1.15rem,5vw,1.8rem)",
+                            fontFamily: "'Syne', sans-serif",
+                            letterSpacing: "-0.03em"
+                        }}
+                    >
+                        Open Auditions Now
+                    </h2>
+
+                    <p className="text-white/55 text-sm sm:text-[15px] leading-relaxed mb-5 sm:mb-6">
+                        Applications are now open for upcoming cinematic productions.
+                        Join the audition process and showcase your talent.
+                    </p>
+
+                    {/* APPLY BUTTON */}
+                    <a
+                        href="/audition"
+                        className="
+                            w-full
+                            h-11
+                            sm:h-12
+                            rounded-2xl
+                            bg-white
+                            text-black
+                            text-[10px]
+                            uppercase
+                            tracking-[0.25em]
+                            sm:tracking-[0.28em]
+                            font-semibold
+                            flex
+                            items-center
+                            justify-center
+                            hover:scale-[1.02]
+                            transition-all
+                            duration-300
                         "
                     >
+                        Apply Now
+                    </a>
 
-                        {/* CLOSE BUTTON */}
-                        <button
-                            onClick={handleClose}
-                            className="
-                                absolute
-                                top-4
-                                right-4
-                                z-30
-                                w-8
-                                h-8
-                                rounded-full
-                                bg-black/60
-                                border
-                                border-white/10
-                                text-white
-                                flex
-                                items-center
-                                justify-center
-                                hover:bg-white
-                                hover:text-black
-                                transition-all
-                                duration-300
-                            "
-                        >
-                            <X size={15} />
-                        </button>
-
-                        {/* IMAGE */}
-                        <div className="relative">
-
-                            <img
-                                src={`http://localhost:5000${activeAudition.audition_poster}`}
-                                alt="Audition Poster"
-                                className="
-                                    w-full
-                                    h-[420px]
-                                    object-cover
-                                "
-                            />
-
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-                        </div>
-
-                        {/* CONTENT */}
-                        <div className="p-5">
-
-                            <p className="text-[9px] uppercase tracking-[0.38em] text-white/40 mb-3">
-                                Moonlight Motion Pictures
-                            </p>
-
-                            <h2
-                                className="
-                                    text-white
-                                    font-bold
-                                    leading-tight
-                                    mb-3
-                                "
-                                style={{
-                                    fontSize: "clamp(1.2rem,3vw,1.8rem)",
-                                    fontFamily: "'Syne', sans-serif",
-                                    letterSpacing: "-0.03em"
-                                }}
-                            >
-                                Open Audition
-                            </h2>
-
-                            <p className="text-white/55 text-sm leading-relaxed mb-6">
-                                Applications are now open for upcoming cinematic productions.
-                                Join the audition process and showcase your talent.
-                            </p>
-
-                            {/* APPLY BUTTON */}
-                            <a
-                                href="/audition"
-                                className="
-                                    w-full
-                                    h-11
-                                    rounded-2xl
-                                    bg-white
-                                    text-black
-                                    text-[10px]
-                                    uppercase
-                                    tracking-[0.28em]
-                                    font-semibold
-                                    flex
-                                    items-center
-                                    justify-center
-                                    hover:scale-[1.02]
-                                    transition-all
-                                    duration-300
-                                "
-                            >
-                                Apply Now
-                            </a>
-
-                        </div>
-                    </div>
                 </div>
-            )}
-        </>
+            </div>
+        </div>
+    )}
+</div>
     );
 };
 

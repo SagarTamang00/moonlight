@@ -6,10 +6,10 @@ import {
   updateNewsBlog,
   deleteNewsBlog,
 } from "../api/newsBlogApi";
+import { BASE_URL } from "../utils/api";
 
 const AdminNewsBlogs = () => {
-  const { news, loading } = useNewsBlogs();
-
+  const { news, loading, fetchNews, setNews } = useNewsBlogs();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -38,39 +38,35 @@ const AdminNewsBlogs = () => {
       description: item.description || "",
       news_link: item.news_link || "",
     });
+    // SCROLL TO TOP FORM
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
-
-  // CREATE / UPDATE NEWS
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const data = new FormData();
 
-      Object.keys(formData).forEach((key) => {
-        data.append(key, formData[key]);
-      });
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("news_link", formData.news_link);
 
+      // only send file if selected
       if (poster) {
         data.append("news_poster", poster);
       }
 
-      // UPDATE
       if (editId) {
-
         await updateNewsBlog(editId, data);
-
         alert("News updated successfully");
-
       } else {
-
-        // CREATE
         await createNewsBlog(data);
-
         alert("News created successfully");
       }
 
-      // RESET FORM
       setFormData({
         title: "",
         description: "",
@@ -80,16 +76,13 @@ const AdminNewsBlogs = () => {
       setPoster(null);
       setEditId(null);
 
-      window.location.reload();
+      await fetchNews();
 
     } catch (err) {
-
       console.log(err);
-
       alert("Operation failed");
     }
   };
-
   // DELETE NEWS
   const handleDelete = async (id) => {
 
@@ -105,7 +98,7 @@ const AdminNewsBlogs = () => {
 
       alert("News deleted successfully");
 
-      window.location.reload();
+      await fetchNews();
 
     } catch (err) {
 
@@ -247,7 +240,8 @@ const AdminNewsBlogs = () => {
             {/* IMAGE */}
             {item.news_poster && (
               <img
-                src={`http://localhost:5000${item.news_poster}`}
+                src={`${BASE_URL}${item.news_poster}`}
+
                 alt="poster"
                 className="w-full h-[220px] object-cover"
               />
@@ -260,7 +254,7 @@ const AdminNewsBlogs = () => {
                 {item.title}
               </h3>
 
-              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-5">
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-5 line-clamp-3">
                 {item.description}
               </p>
 

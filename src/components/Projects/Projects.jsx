@@ -2,8 +2,19 @@ import React, { useRef, useState, useEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import useProjectMedia from '../../hooks/useProjectMedia'
+import useProjectLinks from '../../hooks/useProjectLinks'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return '';
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11)
+    ? `https://www.youtube.com/embed/${match[2]}?autoplay=1&rel=0`
+    : url;
+};
 
 // ─────────────────────────────────────────────────────────────
 // SHARED PROJECT DATA — import this in AllProjects.jsx too
@@ -140,6 +151,11 @@ export const ProjectCard = ({ project, onClick, animClass = '' }) => (
 
 // ── Shared project modal ─────────────────────────────────────
 export const ProjectModal = ({ project, onClose }) => {
+  const [activeVideo, setActiveVideo] = useState(null)
+  const { media, loading } = useProjectMedia(project?.id)
+  const { links } = useProjectLinks(project?.id)
+  const activeMediaData = media?.find(m => m.id === activeVideo)
+
   useEffect(() => {
     if (project) {
       document.body.style.overflow = 'hidden'
@@ -175,21 +191,21 @@ export const ProjectModal = ({ project, onClose }) => {
           </button>
 
           <div className="flex flex-col lg:flex-row h-auto lg:min-h-[60vh]">
-            <div className="w-full lg:w-1/2 h-48 sm:h-64 lg:h-auto relative overflow-hidden shrink-0">
-              <div className="absolute inset-0 w-full h-full bg-black">
+            <div className="w-full lg:w-1/2 h-48 sm:h-64 lg:h-auto relative overflow-hidden shrink-0 flex flex-col">
+              <div className="relative w-full aspect-video sm:h-full lg:h-auto sm:flex-1 shrink-0 bg-black">
                 <div
                   className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-125"
                   style={{ backgroundImage: `url(${project.image})` }}
                 />
                 <img src={project.image} alt={project.title} className="relative w-full h-full object-contain z-10" />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/80 hidden lg:block z-20" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent lg:hidden z-20" />
-              <div className="absolute top-4 left-4 z-30">
-                <span className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${project.status === 'Ongoing'
-                  ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-                  : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
-                  }`}>{project.status}</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/80 hidden lg:block z-20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent lg:hidden z-20" />
+                <div className="absolute top-4 left-4 z-30">
+                  <span className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${project.status === 'Ongoing'
+                    ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
+                    : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
+                    }`}>{project.status}</span>
+                </div>
               </div>
             </div>
 
@@ -202,19 +218,140 @@ export const ProjectModal = ({ project, onClose }) => {
               </h2>
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <span className="px-3 py-1 rounded-full border border-white/20 text-[10px] sm:text-xs tracking-widest uppercase">
-                  In Production
+                  {project.status === 'Ongoing' ? 'In Production' : 'Upcoming'}
                 </span>
-                <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
-                  Est. {project.release}
-                </span>
+                {project.release_year && (
+                  <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
+                    Est. {project.release_year}
+                  </span>
+                )}
+                {project.seasons > 0 && (
+                  <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
+                    {project.seasons} {project.seasons > 1 ? 'Seasons' : 'Season'}
+                  </span>
+                )}
+                {project.episodes > 0 && (
+                  <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
+                    {project.episodes} {project.episodes > 1 ? 'Episodes' : 'Episode'}
+                  </span>
+                )}
+                {project.duration && (
+                  <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
+                    {project.duration}
+                  </span>
+                )}
               </div>
               <p className="text-sm sm:text-base lg:text-lg font-light leading-relaxed text-gray-300 mb-8 sm:mb-10">
                 {project.description}
               </p>
-              {/* <button className="self-start relative overflow-hidden group px-6 py-3 sm:px-8 sm:py-4 border border-white/30 rounded-full text-white text-xs sm:text-sm font-medium tracking-widest uppercase transition-all duration-300">
-                <span className="relative z-10 group-hover:text-black transition-colors duration-300">Register Interest</span>
-                <div className="absolute inset-0 w-full h-full bg-white scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out" />
-              </button> */}
+
+              {/* Media (Youtube Links) */}
+              <div className="border-t border-white/10 pt-6">
+                <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">Media</p>
+
+                <div className="flex flex-col gap-3">
+                  {(() => {
+                    const getYoutubeId = (url) => {
+                      if (!url) return null;
+                      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                      const match = url.match(regExp);
+                      return (match && match[2].length === 11) ? match[2] : null;
+                    };
+                    const youtubeLinks = links?.filter(link => getYoutubeId(link.url)) || [];
+                    
+                    if (youtubeLinks.length === 0) {
+                      return <p className="text-sm text-white/40 italic">No media available yet.</p>;
+                    }
+
+                    return youtubeLinks.map((item) => {
+                      const ytId = getYoutubeId(item.url);
+                      const thumbUrl = ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : '';
+                      return (
+                        <div key={item.id} className="w-full">
+                          {activeVideo === item.id ? (
+                            <div className="w-full mb-1 relative">
+                              <button
+                                onClick={() => setActiveVideo(null)}
+                                className="absolute -top-2 -right-2 z-10 w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 border border-white/30 flex items-center justify-center transition-colors"
+                                aria-label="Close video"
+                              >
+                                <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M1 1l10 10M11 1L1 11" />
+                                </svg>
+                              </button>
+                              <div className="w-full aspect-video rounded-lg overflow-hidden bg-black ring-1 ring-white/20 shadow-xl relative">
+                                <iframe
+                                  className="absolute inset-0 w-full h-full"
+                                  src={getYouTubeEmbedUrl(item.url)}
+                                  title={item.type || 'Video'}
+                                  frameBorder="0"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setActiveVideo(item.id)}
+                              className="flex items-center gap-3 w-full p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-left"
+                            >
+                              <div className="w-14 h-9 rounded overflow-hidden relative shrink-0">
+                                {thumbUrl && <img src={thumbUrl} alt={item.type || 'Video'} className="w-full h-full object-cover" />}
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                  <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M2 1.5l9 4.5-9 4.5V1.5z" />
+                                  </svg>
+                                </div>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs text-white/90 truncate uppercase">{item.type || 'Video'}</p>
+                              </div>
+                              <a
+                                href={item.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[10px] uppercase tracking-wider text-white/50 hover:text-white mr-1 shrink-0 border border-white/20 px-2 py-1 rounded transition-colors"
+                              >
+                                YT
+                              </a>
+                            </button>
+                          )}
+                        </div>
+                      )
+                    });
+                  })()}
+                </div>
+              </div>
+
+              {/* Links */}
+              {links && links.length > 0 && (
+                <div className="border-t border-white/10 pt-6 mt-6">
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">External Links</p>
+                  <div className="flex flex-wrap gap-3">
+                    {links.map((link) => {
+                      const isYoutube = link.url && (link.url.includes('youtube.com') || link.url.includes('youtu.be'));
+                      const labelText = link.type || (isYoutube ? 'YouTube' : 'Link');
+                      return (
+                        <a
+                          key={link.id}
+                          href={link.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2 text-[10px] uppercase tracking-widest px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 hover:text-white text-white/70 transition-colors"
+                        >
+                          {isYoutube && (
+                            <svg className="w-3.5 h-3.5 text-white/80" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.134 0 12 0 12s0 3.866.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.866 24 12 24 12s0-3.866-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                          )}
+                          {labelText} ↗
+                        </a>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -223,10 +360,19 @@ export const ProjectModal = ({ project, onClose }) => {
   )
 }
 
+import useProjects from '../../hooks/useProjects'
+import { BASE_URL } from '../../utils/api'
+
 // ── Homepage section ─────────────────────────────────────────
 export const Projects = ({ onNavigateToAll }) => {
   const sectionRef = useRef(null)
   const [selectedProject, setSelectedProject] = useState(null)
+
+  const { projects } = useProjects()
+
+  // Filter for upcoming/ongoing, take top 3
+  const activeProjects = projects?.filter(p => p.status === 'upcoming' || p.status === 'ongoing') || []
+  const homepageProjects = activeProjects.slice(0, 3)
 
   useGSAP(() => {
     ScrollTrigger.create({
@@ -240,7 +386,7 @@ export const Projects = ({ onNavigateToAll }) => {
         })
       }
     })
-  }, { scope: sectionRef })
+  }, { scope: sectionRef, dependencies: [projects] })
 
   return (
     <section ref={sectionRef} id="projects-section" className="relative min-h-[100dvh] w-full flex items-center justify-center py-20">
@@ -250,13 +396,25 @@ export const Projects = ({ onNavigateToAll }) => {
           UPCOMING / ONGOING HIGHLIGHTS
         </h2>
 
-        {/* Always exactly 3 cards */}
+        {/* Always exactly 3 cards max */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10 w-full">
-          {HOMEPAGE_PROJECTS.map((project) => (
+          {homepageProjects.map((project) => (
             <ProjectCard
               key={project.id}
-              project={project}
-              onClick={setSelectedProject}
+              project={{
+                ...project,
+                category: project.category_name,
+                image: project.poster ? `${BASE_URL}${project.poster}` : '',
+                release: project.release_year,
+                status: project.status.charAt(0).toUpperCase() + project.status.slice(1)
+              }}
+              onClick={() => setSelectedProject({
+                ...project,
+                category: project.category_name,
+                image: project.poster ? `${BASE_URL}${project.poster}` : '',
+                release: project.release_year,
+                status: project.status.charAt(0).toUpperCase() + project.status.slice(1)
+              })}
               animClass="project-card opacity-0 translate-y-12"
             />
           ))}

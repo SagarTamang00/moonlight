@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { releasedProjects } from '../components/Projects/projectsData';
+import useProjects from '../hooks/useProjects';
+import useProjectMedia from '../hooks/useProjectMedia';
+import useProjectLinks from '../hooks/useProjectLinks';
+import useProjectCategories from '../hooks/useProjectCategories';
+import { BASE_URL } from '../utils/api';
 
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return '';
@@ -13,35 +17,9 @@ const getYouTubeEmbedUrl = (url) => {
 
 // ── Modal ──────────────────────────────────────────────────────────────────────
 const ProjectModal = ({ project, onClose }) => {
-  const [activeVideo, setActiveVideo] = useState(null);
-  const [activeSeasonIndex, setActiveSeasonIndex] = useState(0);
-
-  const hasSeasons = project?.seasons && project.seasons.length > 0;
-  const hasFlatVideos = project?.videos && project.videos.length > 0;
-  
-  const currentVideos = hasSeasons 
-    ? project.seasons[activeSeasonIndex]?.episodes || []
-    : project.videos || [];
-
-  useEffect(() => {
-    // Lock body scroll when modal opens
-    const prevBody = document.body.style.overflow;
-    const prevHtml = document.documentElement.style.overflow;
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    window.lenis?.stop();
-
-    const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handleKey);
-
-    return () => {
-      // Restore scroll when modal closes
-      document.body.style.overflow = prevBody;
-      document.documentElement.style.overflow = prevHtml;
-      window.lenis?.start();
-      document.removeEventListener('keydown', handleKey);
-    };
-  }, [onClose]);
+  const { media, loading } = useProjectMedia(project?.id);
+  const { links } = useProjectLinks(project?.id);
+  const activeMediaData = media?.find(m => m.id === activeVideo);
 
   if (!project) return null;
 
@@ -60,15 +38,14 @@ const ProjectModal = ({ project, onClose }) => {
         onClick={(e) => e.stopPropagation()}
         style={{ boxShadow: '0 0 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06)' }}
       >
-        {/* Hero Image */}
         <div className="relative w-full aspect-video shrink-0 overflow-hidden rounded-t-2xl bg-black">
           {/* Blurred Background */}
           <div 
             className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-125" 
-            style={{ backgroundImage: `url(${project.coverImage})` }} 
+            style={{ backgroundImage: `url(${BASE_URL}${project.poster})` }} 
           />
           <img
-            src={project.coverImage}
+            src={project.poster ? `${BASE_URL}${project.poster}` : ''}
             alt={project.title}
             className="relative w-full h-full object-contain z-10"
           />
@@ -88,25 +65,31 @@ const ProjectModal = ({ project, onClose }) => {
           {/* Title overlay */}
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-center gap-3 mb-2 flex-wrap">
-              {project.releaseYear && (
-                <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.releaseYear}</span>
+              {project.release_year && (
+                <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.release_year}</span>
               )}
-              {project.genre && (
+              {project.category_name && (
                 <>
                   <span className="w-px h-3 bg-white/30" />
-                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.genre}</span>
+                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.category_name}</span>
+                </>
+              )}
+              {project.seasons > 0 && (
+                <>
+                  <span className="w-px h-3 bg-white/30" />
+                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.seasons} {project.seasons > 1 ? 'Seasons' : 'Season'}</span>
+                </>
+              )}
+              {project.episodes > 0 && (
+                <>
+                  <span className="w-px h-3 bg-white/30" />
+                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.episodes} {project.episodes > 1 ? 'Episodes' : 'Episode'}</span>
                 </>
               )}
               {project.duration && (
                 <>
                   <span className="w-px h-3 bg-white/30" />
                   <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.duration}</span>
-                </>
-              )}
-              {project.language && (
-                <>
-                  <span className="w-px h-3 bg-white/30" />
-                  <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.language}</span>
                 </>
               )}
             </div>
@@ -159,104 +142,110 @@ const ProjectModal = ({ project, onClose }) => {
             </div>
           )}
 
-          {/* Seasons & Videos */}
-          {(hasSeasons || hasFlatVideos) && (
-            <div className="border-t border-white/10 pt-6">
-              
-              {/* Season Tabs & Actions (if applicable) */}
-              {hasSeasons && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
-                    {project.seasons.map((season, index) => (
-                      <button
-                        key={season.seasonNumber}
-                        onClick={() => setActiveSeasonIndex(index)}
-                        className={`whitespace-nowrap px-4 py-2 rounded-full text-xs tracking-wider uppercase transition-all border ${
-                          activeSeasonIndex === index 
-                            ? 'bg-white text-black border-white font-medium' 
-                            : 'bg-transparent text-white/60 border-white/20 hover:border-white/50 hover:text-white'
-                        }`}
-                      >
-                        {season.seasonTitle}
-                      </button>
-                    ))}
-                  </div>
+          {/* Media (Youtube Links) */}
+          <div className="border-t border-white/10 pt-6">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">Media</p>
 
-                  {project.seasons[activeSeasonIndex]?.playlistLink && (
-                    <a
-                      href={project.seasons[activeSeasonIndex].playlistLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded border border-white/20 text-[10px] uppercase tracking-wider text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                    >
-                      Watch Full Playlist
-                      <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" /></svg>
-                    </a>
-                  )}
-                </div>
-              )}
+            <div className="flex flex-col gap-3">
+              {(() => {
+                const getYoutubeId = (url) => {
+                  if (!url) return null;
+                  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                  const match = url.match(regExp);
+                  return (match && match[2].length === 11) ? match[2] : null;
+                };
+                const youtubeLinks = links?.filter(link => getYoutubeId(link.url)) || [];
+                
+                if (youtubeLinks.length === 0) {
+                  return <p className="text-sm text-white/40 italic">No media available yet.</p>;
+                }
 
-              {!hasSeasons && <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">Videos</p>}
-
-              <div className="flex flex-col gap-3">
-                {currentVideos.length === 0 ? (
-                  <p className="text-sm text-white/40 italic">No videos available yet.</p>
-                ) : currentVideos.map((video) => (
-                  <div key={video.id} className="w-full">
-                    {activeVideo === video.id && video.youtubeLink ? (
-                      <div className="w-full mb-1 relative">
-                        <button
-                          onClick={() => setActiveVideo(null)}
-                          className="absolute -top-2 -right-2 z-10 w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 border border-white/30 flex items-center justify-center transition-colors"
-                          aria-label="Close video"
-                        >
-                          <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1 1l10 10M11 1L1 11" />
-                          </svg>
-                        </button>
-                        <div className="w-full aspect-video rounded-lg overflow-hidden bg-black ring-1 ring-white/20 shadow-xl relative">
-                          <iframe
-                            className="absolute inset-0 w-full h-full"
-                            src={getYouTubeEmbedUrl(video.youtubeLink)}
-                            title={video.label}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setActiveVideo(video.id)}
-                        className="flex items-center gap-3 w-full p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-left"
-                      >
-                        <div className="w-14 h-9 rounded overflow-hidden relative shrink-0">
-                          <img src={video.thumb} alt={video.label} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor">
-                              <path d="M2 1.5l9 4.5-9 4.5V1.5z" />
+                return youtubeLinks.map((item) => {
+                  const ytId = getYoutubeId(item.url);
+                  const thumbUrl = ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : '';
+                  return (
+                    <div key={item.id} className="w-full">
+                      {activeVideo === item.id ? (
+                        <div className="w-full mb-1 relative">
+                          <button
+                            onClick={() => setActiveVideo(null)}
+                            className="absolute -top-2 -right-2 z-10 w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 border border-white/30 flex items-center justify-center transition-colors"
+                            aria-label="Close video"
+                          >
+                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M1 1l10 10M11 1L1 11" />
                             </svg>
+                          </button>
+                          <div className="w-full aspect-video rounded-lg overflow-hidden bg-black ring-1 ring-white/20 shadow-xl relative">
+                            <iframe
+                              className="absolute inset-0 w-full h-full"
+                              src={getYouTubeEmbedUrl(item.url)}
+                              title={item.type || 'Video'}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
                           </div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs text-white/90 truncate">{video.label}</p>
-                          {video.duration && <p className="text-[9px] text-white/40">{video.duration}</p>}
-                        </div>
-                        {video.youtubeLink && (
+                      ) : (
+                        <button
+                          onClick={() => setActiveVideo(item.id)}
+                          className="flex items-center gap-3 w-full p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-left"
+                        >
+                          <div className="w-14 h-9 rounded overflow-hidden relative shrink-0">
+                            {thumbUrl && <img src={thumbUrl} alt={item.type || 'Video'} className="w-full h-full object-cover" />}
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M2 1.5l9 4.5-9 4.5V1.5z" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-white/90 truncate uppercase">{item.type || 'Video'}</p>
+                          </div>
                           <a
-                            href={video.youtubeLink}
+                            href={item.url}
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] uppercase tracking-wider text-white/50 hover:text-white mr-1 shrink-0 border border-white/20 px-2 py-1 rounded"
+                            className="text-[10px] uppercase tracking-wider text-white/50 hover:text-white mr-1 shrink-0 border border-white/20 px-2 py-1 rounded transition-colors"
                           >
                             YT
                           </a>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                ))}
+                        </button>
+                      )}
+                    </div>
+                  )
+                });
+              })()}
+            </div>
+          </div>
+
+          {/* Links */}
+          {links && links.length > 0 && (
+            <div className="border-t border-white/10 pt-6 mt-6">
+              <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">External Links</p>
+              <div className="flex flex-wrap gap-3">
+                {links.map((link) => {
+                  const isYoutube = link.url && (link.url.includes('youtube.com') || link.url.includes('youtu.be'));
+                  const labelText = link.type || (isYoutube ? 'YouTube' : 'Link');
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 text-[10px] uppercase tracking-widest px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 hover:text-white text-white/70 transition-colors"
+                    >
+                      {isYoutube && (
+                        <svg className="w-3.5 h-3.5 text-white/80" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.134 0 12 0 12s0 3.866.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.866 24 12 24 12s0-3.866-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                      )}
+                      {labelText} ↗
+                    </a>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -266,10 +255,19 @@ const ProjectModal = ({ project, onClose }) => {
   );
 };
 
-// ── Main Page ──────────────────────────────────────────────────────────────────
 export const AllProjectsPage = () => {
   const [activeVideo, setActiveVideo] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState('All Categories');
+  
+  const { projects } = useProjects();
+  const { categories } = useProjectCategories();
+  
+  const allProjects = projects?.filter(p => p.status === 'completed') || [];
+  
+  const filteredProjects = allProjects.filter(p => {
+    return categoryFilter === 'All Categories' || p.category_name === categoryFilter;
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -296,11 +294,41 @@ export const AllProjectsPage = () => {
               ALL <span className="text-white/20">PROJECTS</span>
             </h1>
           </div>
+          
+          {/* Category Filter */}
+          <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded-full border border-white/10 overflow-x-auto max-w-full scrollbar-hide">
+            <button
+              onClick={() => setCategoryFilter('All Categories')}
+              className={`px-4 py-2 rounded-full text-[10px] tracking-[0.2em] uppercase transition-all duration-300 whitespace-nowrap ${
+                categoryFilter === 'All Categories' 
+                  ? 'bg-white text-black font-semibold shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
+                  : 'text-white/50 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              All Categories
+            </button>
+            {categories?.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setCategoryFilter(cat.name)}
+                className={`px-4 py-2 rounded-full text-[10px] tracking-[0.2em] uppercase transition-all duration-300 whitespace-nowrap flex items-center gap-2 ${
+                  categoryFilter === cat.name 
+                    ? 'bg-white text-black font-semibold shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
+                    : 'text-white/50 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {cat.image_path && (
+                  <img src={`${BASE_URL}/${cat.image_path}`} alt={cat.name} className="w-4 h-4 rounded-full object-cover inline-block" />
+                )}
+                {cat.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Grid of Projects */}
         <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {releasedProjects.map((project) => (
+          {filteredProjects.map((project) => (
             <div
               key={project.id}
               className="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 flex flex-col"
@@ -310,19 +338,19 @@ export const AllProjectsPage = () => {
                 {/* Blurred Background */}
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-xl opacity-40 scale-125 transition-transform duration-1000 group-hover:scale-150"
-                  style={{ backgroundImage: `url(${project.coverImage})` }}
+                  style={{ backgroundImage: `url(${BASE_URL}${project.poster})` }}
                 />
                 <img
-                  src={project.coverImage}
+                  src={project.poster ? `${BASE_URL}${project.poster}` : ''}
                   alt={project.title}
                   className="relative w-full h-full object-contain transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100 z-10"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-20" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.releaseYear}</span>
+                    <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.release_year}</span>
                     <span className="w-px h-3 bg-white/30" />
-                    <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.genre}</span>
+                    <span className="text-[10px] text-white/60 tracking-[0.2em] uppercase">{project.category_name}</span>
                   </div>
                   <h3 className="text-2xl font-cinematic text-white drop-shadow-md">{project.title}</h3>
                 </div>
@@ -343,69 +371,20 @@ export const AllProjectsPage = () => {
                 </button>
 
                 <div className="mt-auto">
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-3">Videos</p>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-3">Media</p>
                   <div className="flex flex-col gap-3">
-                    {project.videos && project.videos.map((video) => (
-                      <div key={video.id} className="w-full">
-                        {activeVideo === video.id && video.youtubeLink ? (
-                          <div className="w-full mb-2 relative">
-                            <button
-                              onClick={() => setActiveVideo(null)}
-                              className="absolute -top-2 -right-2 z-10 w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 border border-white/30 flex items-center justify-center transition-colors"
-                              aria-label="Close video"
-                            >
-                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M1 1l10 10M11 1L1 11" />
-                              </svg>
-                            </button>
-                            <div className="w-full aspect-video rounded overflow-hidden bg-black ring-1 ring-white/20 shadow-xl">
-                              <iframe
-                                className="w-full h-full"
-                                src={getYouTubeEmbedUrl(video.youtubeLink)}
-                                title={video.label}
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setActiveVideo(video.id)}
-                            className="flex items-center gap-3 w-full p-2 rounded bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-left"
-                          >
-                            <div className="w-12 h-8 rounded overflow-hidden relative shrink-0">
-                              <img src={video.thumb} alt={video.label} className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor">
-                                  <path d="M2 1.5l9 4.5-9 4.5V1.5z" />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs text-white/90 truncate">{video.label}</p>
-                              <p className="text-[9px] text-white/40">{video.duration}</p>
-                            </div>
-                            {video.youtubeLink && (
-                              <a
-                                href={video.youtubeLink}
-                                target="_blank"
-                                rel="noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="text-[10px] uppercase tracking-wider text-white/50 hover:text-white mr-2 shrink-0 border border-white/20 px-2 py-1 rounded"
-                              >
-                                YT
-                              </a>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                    <p className="text-xs text-white/40 italic">Open details to view media.</p>
                   </div>
                 </div>
               </div>
             </div>
           ))}
+          
+          {filteredProjects.length === 0 && (
+            <div className="col-span-full py-20 text-center text-white/40">
+              <p className="tracking-widest uppercase">No projects found in this category.</p>
+            </div>
+          )}
         </div>
       </div>
 

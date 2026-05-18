@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import useProjects from "../hooks/useProjects";
 import useProjectCategories from "../hooks/useProjectCategories";
-
 import {
   createProject,
   deleteProject,
+  updateProject,
 } from "../api/projectApi";
 
 const AdminProjects = () => {
@@ -14,6 +14,9 @@ const AdminProjects = () => {
 
   const { categories } =
     useProjectCategories();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null);
 
   const [formData, setFormData] = useState({
     category_id: "",
@@ -58,40 +61,47 @@ const AdminProjects = () => {
     e.preventDefault();
 
     try {
-
       const data = new FormData();
 
-      Object.keys(formData).forEach(
-        (key) => {
-          data.append(
-            key,
-            formData[key]
-          );
-        }
-      );
+      Object.keys(formData).forEach((key) => {
+        data.append(key, formData[key]);
+      });
 
       if (poster) {
         data.append("poster", poster);
       }
 
-      await createProject(data);
-
-      alert(
-        "Project created successfully"
-      );
+      if (isEditing) {
+        await updateProject(editId, data);
+        alert("Project updated successfully");
+      } else {
+        await createProject(data);
+        alert("Project created successfully");
+      }
 
       window.location.reload();
-
     } catch (err) {
-
       console.log(err);
-
-      alert(
-        "Failed to create project"
-      );
+      alert(isEditing ? "Failed to update project" : "Failed to create project");
     }
   };
 
+  const handleEdit = (project) => {
+    setIsEditing(true);
+    setEditId(project.id);
+
+    setFormData({
+      category_id: project.category_id || "",
+      title: project.title || "",
+      description: project.description || "",
+      duration: project.duration || "",
+      seasons: project.seasons || "",
+      episodes: project.episodes || "",
+      release_year: project.release_year || "",
+      status: project.status || "upcoming",
+      featured: project.featured ? true : false,
+    });
+  };
   // DELETE PROJECT
   const handleDelete = async (id) => {
 
@@ -371,7 +381,7 @@ const AdminProjects = () => {
               type="submit"
               className="h-12 px-6 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-medium hover:scale-[1.02] transition-all duration-300"
             >
-              Create Project
+              {editId ? "Update Project" : "Create Project"}
             </button>
 
           </div>
@@ -430,6 +440,13 @@ const AdminProjects = () => {
 
                 </div>
               )}
+              {/* EDIT BUTTON */}
+              <button
+                onClick={() => handleEdit(project)}
+                className="w-full h-11 rounded-2xl border border-black dark:border-white text-black dark:text-white mb-3"
+              >
+                Edit Project
+              </button>
 
               {/* DELETE */}
               <button

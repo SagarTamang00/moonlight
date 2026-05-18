@@ -3,6 +3,7 @@ import useSettings from "../hooks/useSettings";
 import { updateSettings } from "../api/settings";
 import { BASE_URL } from "../utils/api";
 import PopupModal from "./PopupModal";
+import { Image as ImageIcon } from "lucide-react";
 
 const getEmbedUrl = (url) => {
     if (!url) return null;
@@ -94,7 +95,14 @@ const AdminSettings = () => {
     );
 
     return (
-        <div className="max-w-2xl mx-auto px-4 py-10 relative">
+<div className="h-screen overflow-hidden bg-neutral-50 dark:bg-black">
+
+    {/* SCROLLABLE AREA ONLY */}
+    <div className="h-full overflow-y-auto">
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+            {/* Modal */}
             <PopupModal
                 {...modal}
                 onCancel={closeModal}
@@ -104,142 +112,244 @@ const AdminSettings = () => {
                 }}
             />
 
-            {/* Page title */}
-            <h1 className="text-xl font-medium text-black dark:text-white mb-8">
-                Settings
-            </h1>
+            {/* Header */}
+            <div className="mb-10">
+                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-black dark:text-white">
+                    Settings
+                </h1>
+                <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+                    Manage your website information and contact details.
+                </p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Card */}
+            <div className="bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm overflow-hidden">
 
-                {/* Logo upload */}
-                <input
-                    id="logo-input"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => handleFile(e.target.files[0])}
-                />
-                <div
-                    onClick={() => document.getElementById("logo-input").click()}
-                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                    onDragLeave={() => setDragging(false)}
-                    onDrop={(e) => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]); }}
-                    className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors
-                        ${dragging
-                            ? "border-black dark:border-white bg-neutral-50 dark:bg-neutral-900"
-                            : "border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
-                        }`}
-                >
-                    <div className="w-14 h-14 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {logoPreview || settings?.logo ? (
-                            <img
-                                src={logoPreview || `${BASE_URL}${settings.logo}`}
-                                alt="logo"
-                                className="w-full h-full object-contain p-1.5"
-                            />
-                        ) : (
-                            <i className="ti ti-photo text-neutral-400 dark:text-neutral-600 text-xl" />
+                <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-8">
+
+                    {/* Logo Upload */}
+                    <div>
+                        <label className="block text-sm font-medium text-black dark:text-white mb-3">
+                            Site Logo
+                        </label>
+
+                        <input
+                            id="logo-input"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleFile(e.target.files[0])}
+                        />
+
+                        <div
+                            onClick={() => document.getElementById("logo-input").click()}
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                setDragging(true);
+                            }}
+                            onDragLeave={() => setDragging(false)}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                setDragging(false);
+                                handleFile(e.dataTransfer.files[0]);
+                            }}
+                            className={`
+                                group relative flex flex-col sm:flex-row items-center gap-5
+                                p-5 rounded-2xl border-2 border-dashed transition-all cursor-pointer
+                                ${dragging
+                                    ? "border-black dark:border-white bg-neutral-100 dark:bg-neutral-900"
+                                    : "border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500"
+                                }
+                            `}
+                        >
+                            <div className="w-24 h-24 rounded-2xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
+                                {logoPreview || settings?.logo ? (
+                                    <img
+                                        src={logoPreview || `${BASE_URL}${settings.logo}`}
+                                        alt="logo"
+                                        className="w-full h-full object-contain p-3"
+                                    />
+                                ) : (
+                                    <ImageIcon className="w-8 h-8 text-neutral-400 dark:text-neutral-600" />
+                                )}
+                            </div>
+
+                            <div className="text-center sm:text-left">
+                                <p className="text-sm font-medium text-black dark:text-white">
+                                    Upload your logo
+                                </p>
+                                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                                    Drag & drop or click to browse
+                                </p>
+                                <p className="mt-2 text-[11px] text-neutral-400 dark:text-neutral-500">
+                                    Supports PNG, JPG, SVG
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* About */}
+                    <div>
+                        <label className="block text-sm font-medium text-black dark:text-white mb-3">
+                            About Description
+                        </label>
+
+                        <textarea
+                            name="about_description"
+                            value={form.about_description}
+                            onChange={handleChange}
+                            rows={5}
+                            placeholder="Write a short description about your business..."
+                            className="
+                                w-full rounded-xl border border-neutral-200 dark:border-neutral-800
+                                bg-white dark:bg-neutral-900
+                                px-4 py-3 text-sm
+                                text-black dark:text-white
+                                placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+                                outline-none resize-none transition-all
+                                focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10
+                                focus:border-neutral-400 dark:focus:border-neutral-600
+                            "
+                        />
+                    </div>
+
+                    {/* Google Maps */}
+                    <div>
+                        <label className="block text-sm font-medium text-black dark:text-white mb-3">
+                            Location
+                        </label>
+
+                        <input
+                            name="google_maps_link"
+                            value={form.google_maps_link}
+                            onChange={handleChange}
+                            placeholder="Address or Google Maps embed link"
+                            className="
+                                w-full h-11 rounded-xl border border-neutral-200 dark:border-neutral-800
+                                bg-white dark:bg-neutral-900
+                                px-4 text-sm
+                                text-black dark:text-white
+                                placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+                                outline-none transition-all
+                                focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10
+                                focus:border-neutral-400 dark:focus:border-neutral-600
+                            "
+                        />
+
+                        {form.google_maps_link && (
+                            <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
+                                <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900">
+                                    <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
+                                        Live Preview
+                                    </p>
+                                </div>
+
+                                <div className="relative h-[220px] sm:h-[300px]">
+                                    <iframe
+                                        src={getEmbedUrl(form.google_maps_link)}
+                                        width="100%"
+                                        height="100%"
+                                        allowFullScreen=""
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                </div>
+                            </div>
                         )}
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-black dark:text-white">Site logo</p>
-                        <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
-                            Click to upload — PNG, JPG or SVG
-                        </p>
-                    </div>
-                </div>
 
-                {/* About */}
-                <div>
-                    <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">
-                        About description
-                    </label>
-                    <textarea
-                        name="about_description"
-                        value={form.about_description}
-                        onChange={handleChange}
-                        rows={4}
-                        placeholder="Write a short description…"
-                        className="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-black dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 outline-none focus:border-neutral-400 dark:focus:border-neutral-600 resize-none transition-colors"
-                    />
-                </div>
+                    {/* Contact Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                {/* Google Maps */}
-                <div>
-                    <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">
-                        Location (Address or Google Maps Embed link)
-                    </label>
-                    <input
-                        name="google_maps_link"
-                        value={form.google_maps_link}
-                        onChange={handleChange}
-                        placeholder="e.g. Kathmandu, Nepal OR <iframe src='...' />"
-                        className="w-full h-10 px-3 text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-black dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-                    />
-                    {form.google_maps_link && (
-                        <div className="mt-3 relative w-full overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800" style={{ height: '180px' }}>
-                            <iframe
-                                src={getEmbedUrl(form.google_maps_link)}
-                                width="100%"
-                                height="100%"
-                                allowFullScreen=""
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
+                        {/* Email */}
+                        <div>
+                            <label className="block text-sm font-medium text-black dark:text-white mb-3">
+                                Contact Email
+                            </label>
+
+                            <input
+                                name="contact_email"
+                                type="email"
+                                value={form.contact_email}
+                                onChange={handleChange}
+                                placeholder="studio@example.com"
+                                className="
+                                    w-full h-11 rounded-xl border border-neutral-200 dark:border-neutral-800
+                                    bg-white dark:bg-neutral-900
+                                    px-4 text-sm
+                                    text-black dark:text-white
+                                    placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+                                    outline-none transition-all
+                                    focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10
+                                    focus:border-neutral-400 dark:focus:border-neutral-600
+                                "
                             />
-                            <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(8,8,8,0.1)' }} />
-                            <p className="absolute top-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded text-[9px] font-bold tracking-widest uppercase text-white/80">
-                                Live Preview
-                            </p>
                         </div>
-                    )}
-                </div>
 
-                {/* Email + Phone */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">
-                            Email
-                        </label>
-                        <input
-                            name="contact_email"
-                            type="email"
-                            value={form.contact_email}
-                            onChange={handleChange}
-                            placeholder="studio@example.com"
-                            className="w-full h-10 px-3 text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-black dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-                        />
+                        {/* Phone */}
+                        <div>
+                            <label className="block text-sm font-medium text-black dark:text-white mb-3">
+                                Contact Phone
+                            </label>
+
+                            <input
+                                name="contact_phone"
+                                type="tel"
+                                value={form.contact_phone}
+                                onChange={handleChange}
+                                placeholder="+1 234 567 890"
+                                className="
+                                    w-full h-11 rounded-xl border border-neutral-200 dark:border-neutral-800
+                                    bg-white dark:bg-neutral-900
+                                    px-4 text-sm
+                                    text-black dark:text-white
+                                    placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+                                    outline-none transition-all
+                                    focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10
+                                    focus:border-neutral-400 dark:focus:border-neutral-600
+                                "
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">
-                            Phone
-                        </label>
-                        <input
-                            name="contact_phone"
-                            type="tel"
-                            value={form.contact_phone}
-                            onChange={handleChange}
-                            placeholder="+1 234 567 890"
-                            className="w-full h-10 px-3 text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-black dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-                        />
+
+                    {/* Footer */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+
+                        <span
+                            className={`
+                                text-sm font-medium text-green-600 dark:text-green-400
+                                transition-all duration-300
+                                ${saved ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"}
+                            `}
+                        >
+                            Settings saved successfully
+                        </span>
+
+                        <button
+                            type="submit"
+                            disabled={submitting}
+                            className="
+                                w-full sm:w-auto
+                                h-11 px-6 rounded-xl
+                                bg-black dark:bg-white
+                                text-white dark:text-black
+                                text-sm font-medium
+                                transition-all
+                                hover:opacity-90
+                                active:scale-[0.98]
+                                disabled:opacity-50
+                                disabled:cursor-not-allowed
+                            "
+                        >
+                            {submitting ? "Saving..." : "Save Settings"}
+                        </button>
                     </div>
-                </div>
 
-                {/* Footer */}
-                <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-neutral-800">
-                    <span className={`text-sm text-green-600 dark:text-green-400 transition-opacity duration-300 ${saved ? "opacity-100" : "opacity-0"}`}>
-                        Saved successfully
-                    </span>
-                    <button
-                        type="submit"
-                        disabled={submitting}
-                        className="h-9 px-5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium rounded-lg transition-opacity hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                        {submitting ? "Saving…" : "Save settings"}
-                    </button>
-                </div>
-
-            </form>
+                </form>
+            </div>
         </div>
+    </div>
+</div>
     );
 };
 

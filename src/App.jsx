@@ -14,21 +14,39 @@ import Partners from './components/Partner/Partner'
 import News from './components/News/News'
 import { Projects } from './components/Projects/Projects'
 import { CompletedProjects } from './components/Projects/CompletedProjects'
+import { MediaGallery } from './components/Media/MediaGallery'
 import { Footer } from './components/Footer/Footer'
 import { Header } from './components/Header/Header'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AllProjectsPage } from './pages/AllProjectsPage'
 import { AllUpcomingProjectsPage } from './pages/AllUpcomingProjectsPage'
 import AdminLogin from "./Admin/AdminLogin"
 import AdminDashboard from "./Admin/AdminDashboard"
+import AdminLayout from "./Admin/AdminLayout"
+import AdminSettings from "./Admin/AdminSettings"
+import AdminSocialLinks from "./Admin/AdminSocialLinks"
+import AdminTeam from "./Admin/AdminTeam"
+import AdminPartners from "./Admin/AdminPartners"
+import AdminProjects from "./Admin/AdminProjects"
+import AdminNewsBlogs from "./Admin/AdminNewsBlogs"
+import AdminAudition from "./Admin/AdminAuditions"
+import AdminProjectCategories from "./Admin/AdminProjectCategories"
+import AdminProjectLinks from "./Admin/AdminProjectLinks"
+import AdminProjectMedia from "./Admin/AdminProjectMedia"
+import AdminProfile from "./Admin/AdminProfile"
 import AuditionModal from './components/Audition/AuditionModal'
-import { Collaboration } from './components/Header/Collaboration'
+import Collaboration from './components/Header/Collaboration'
 import AuditionApply from "./pages/AuditionApply";
+import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
+
+
 
 
 gsap.registerPlugin(ScrollTrigger)
 
 function App() {
+
   const containerRef = useRef(null)
   const moonRef = useRef(null)
   const gapRef = useRef(null)
@@ -243,6 +261,7 @@ function App() {
               <Team />
               <Projects />
               <CompletedProjects />
+              <MediaGallery />
               <Partners />
               <Footer />
             </div>
@@ -258,8 +277,25 @@ function App() {
         <Route path="/all-projects" element={<AllProjectsPage />} />
         <Route path="/upcoming-projects" element={<AllUpcomingProjectsPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="team" element={<AdminTeam />} />
+          <Route path="social-links" element={<AdminSocialLinks />} />
+          <Route path="partners" element={<AdminPartners />} />
+          <Route path="projects" element={<AdminProjects />} />
+          <Route path="news-blogs" element={<AdminNewsBlogs />} />
+          <Route path="auditions" element={<AdminAudition />} />
+          <Route path="project-categories" element={<AdminProjectCategories />} />
+          <Route path="project-links" element={<AdminProjectLinks />} />
+          <Route path="project-media" element={<AdminProjectMedia />} />
+          <Route path="profile" element={<AdminProfile />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </LenisWrapper>
   )

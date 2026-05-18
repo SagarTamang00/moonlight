@@ -7,10 +7,16 @@ import {
   updateAuditionStatus,
   deleteAudition,
 } from "../api/auditionApi";
+import { BASE_URL } from "../utils/api";
+
 
 const AdminAuditions = () => {
-  const { auditions, loading } = useAuditions();
-
+const {
+  auditions,
+  loading,
+  fetchAuditions,
+  setAuditions,
+} = useAuditions();
   const [poster, setPoster] = useState(null);
 
   const [status, setStatus] = useState("open");
@@ -21,83 +27,73 @@ const AdminAuditions = () => {
   };
 
   // CREATE AUDITION
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const formData = new FormData();
+  try {
+    const formData = new FormData();
 
-      formData.append(
-        "audition_poster",
-        poster
-      );
+    formData.append("audition_poster", poster);
+    formData.append("status", status);
 
-      formData.append(
-        "status",
-        status
-      );
+    await createAudition(formData);
 
-      await createAudition(formData);
+    alert("Audition created successfully");
 
-      alert("Audition created successfully");
-
-      window.location.reload();
-
-    } catch (err) {
-
-      console.log(err);
-
-      alert("Failed to create audition");
-    }
-  };
+    await fetchAuditions(); // ✅ FIX
+  } catch (err) {
+    console.log(err);
+    alert("Failed to create audition");
+  }
+};
 
   // UPDATE STATUS
-  const handleStatusChange = async (
-    id,
-    newStatus
-  ) => {
-    try {
+const handleStatusChange = async (id, newStatus) => {
+  try {
+    await updateAuditionStatus(id, {
+      status: newStatus,
+    });
 
-      await updateAuditionStatus(id, {
-        status: newStatus,
-      });
+    alert("Status updated");
 
-      alert("Status updated");
-
-      window.location.reload();
-
-    } catch (err) {
-
-      console.log(err);
-
-      alert("Failed to update status");
-    }
-  };
-
-  // DELETE
-  const handleDelete = async (id) => {
-
-    const confirmDelete = window.confirm(
-      "Delete this audition?"
+    // ✅ instant UI update (optional but BEST UX)
+    setAuditions((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, status: newStatus }
+          : item
+      )
     );
 
-    if (!confirmDelete) return;
+  } catch (err) {
+    console.log(err);
+    alert("Failed to update status");
+  }
+};
 
-    try {
+  // DELETE
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm(
+    "Delete this audition?"
+  );
 
-      await deleteAudition(id);
+  if (!confirmDelete) return;   
 
-      alert("Audition deleted");
+  try {
+    await deleteAudition(id);
 
-      window.location.reload();
+    alert("Audition deleted");
 
-    } catch (err) {
+    // ✅ instant UI update
+    setAuditions((prev) =>
+      prev.filter((item) => item.id !== id)
+    );
 
-      console.log(err);
-
-      alert("Failed to delete audition");
-    }
-  };
+  } catch (err) {
+    console.log(err);
+    alert("Failed to delete audition");
+  }
+};
 
   if (loading) {
     return (
@@ -197,7 +193,7 @@ const AdminAuditions = () => {
 
             {/* IMAGE */}
             <img
-              src={`http://localhost:5000${item.audition_poster}`}
+src={`${BASE_URL}${item.audition_poster}`}
               alt="Audition Poster"
               className="w-full h-[260px] object-cover"
             />

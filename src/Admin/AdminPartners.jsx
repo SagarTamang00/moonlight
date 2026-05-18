@@ -1,209 +1,359 @@
-    import { useState } from "react";
-    import usePartners from "../hooks/usePartners";
-    import { createPartner, deletePartner } from "../api/partnerApi";
+import { useState } from "react";
 
-    const AdminPartners = () => {
-        const { partners, loading } = usePartners();
+import usePartners from "../hooks/usePartners";
 
-        const [formData, setFormData] = useState({
+import {
+    createPartner,
+    deletePartner,
+    updatePartner
+} from "../api/partnerApi";
+import { BASE_URL } from "../utils/api";
+
+
+const AdminPartners = () => {
+
+    const {
+        partners,
+        loading,
+        refetchPartners
+    } = usePartners();
+
+    const [editingId, setEditingId] = useState(null);
+
+    const [formData, setFormData] = useState({
+        name: "",
+        website: "",
+        description: "",
+        type: "",
+    });
+
+    const [logo, setLogo] = useState(null);
+
+    const handleChange = (e) => {
+
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const resetForm = () => {
+
+        setFormData({
             name: "",
             website: "",
             description: "",
             type: "",
         });
 
-        const [logo, setLogo] = useState(null);
+        setLogo(null);
+        setEditingId(null);
+    };
 
-        const handleChange = (e) => {
-            setFormData({
-                ...formData,
-                [e.target.name]: e.target.value,
+    const handleSubmit = async (e) => {
+
+        e.preventDefault();
+
+        try {
+
+            const data = new FormData();
+
+            Object.keys(formData).forEach((key) => {
+                data.append(key, formData[key]);
             });
-        };
 
-        const handleSubmit = async (e) => {
-            e.preventDefault();
+            if (logo) {
+                data.append("logo", logo);
+            }
 
-            try {
-                const data = new FormData();
+            // UPDATE
+            if (editingId) {
 
-                Object.keys(formData).forEach((key) => {
-                    data.append(key, formData[key]);
-                });
+                await updatePartner(editingId, data);
 
-                if (logo) data.append("logo", logo);
+                alert("Partner updated successfully");
 
+            } else {
+
+                // CREATE
                 await createPartner(data);
 
                 alert("Partner created successfully");
-                window.location.reload();
-            } catch (err) {
-                console.log(err);
-                alert("Failed to create partner");
             }
-        };
 
-        const handleDelete = async (id) => {
-            if (!window.confirm("Delete this partner?")) return;
+            // REFETCH DATA
+            await refetchPartners();
 
-            try {
-                await deletePartner(id);
-                alert("Partner deleted successfully");
-                window.location.reload();
-            } catch (err) {
-                console.log(err);
-                alert("Failed to delete partner");
-            }
-        };
+            // RESET FORM
+            resetForm();
 
-        if (loading) {
-            return (
-                <div className="min-h-screen flex items-center justify-center text-[var(--color-text)]">
-                    Loading...
-                </div>
+        } catch (err) {
+
+            console.log(err);
+
+            alert(
+                editingId
+                    ? "Failed to update partner"
+                    : "Failed to create partner"
             );
         }
+    };
+
+const handleEdit = (item) => {
+
+    setEditingId(item.id);
+
+    setFormData({
+        name: item.name || "",
+        website: item.website || "",
+        description: item.description || "",
+        type: item.type || "",
+    });
+
+    // SCROLL TO TOP FORM
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+};
+
+    const handleDelete = async (id) => {
+
+        if (!window.confirm("Delete this partner?")) return;
+
+        try {
+
+            await deletePartner(id);
+
+            alert("Partner deleted successfully");
+
+            await refetchPartners();
+
+        } catch (err) {
+
+            console.log(err);
+
+            alert("Failed to delete partner");
+        }
+    };
+
+    if (loading) {
 
         return (
-            <div className="min-h-screen px-6 py-12 bg-[var(--color-bg)] text-[var(--color-text)]">
-                <div className="max-w-7xl mx-auto">
+            <div className="min-h-screen flex items-center justify-center text-[var(--color-text)]">
+                Loading...
+            </div>
+        );
+    }
 
-                    {/* HEADER */}
-                    <div className="mb-12">
-                        <h1 className="text-4xl font-bold tracking-tight">
-                            Partners Admin
-                        </h1>
-                        <p className="text-sm opacity-70 mt-2">
-                            Manage partners, sponsors & platforms
-                        </p>
-                    </div>
+    return (
 
-                    <div className="flex flex-col items-center gap-14">
+        <div className="min-h-screen px-6 py-12 bg-[var(--color-bg)] text-[var(--color-text)]">
 
-                        {/* CREATE FORM */}
-                        <div className="w-full max-w-2xl bg-[var(--color-bg-section)] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-xl">
+            <div className="max-w-7xl mx-auto">
 
-                            <h2 className="text-xl font-semibold mb-6 text-cente">
-                                Add Partner
-                            </h2>
+                {/* HEADER */}
+                <div className="mb-12">
 
-                            <form
-                                onSubmit={handleSubmit}
-                                className="space-y-5"
+                    <h1 className="text-4xl font-bold tracking-tight">
+                        Partners Admin
+                    </h1>
+
+                    <p className="text-sm opacity-70 mt-2">
+                        Manage partners, sponsors & platforms
+                    </p>
+
+                </div>
+
+                <div className="flex flex-col items-center gap-14">
+
+                    {/* FORM */}
+                    <div className="w-full max-w-2xl bg-[var(--color-bg-section)] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-xl">
+
+                        <h2 className="text-xl font-semibold mb-6">
+
+                            {editingId
+                                ? "Edit Partner"
+                                : "Add Partner"}
+
+                        </h2>
+
+                        <form
+                            onSubmit={handleSubmit}
+                            className="space-y-5"
+                        >
+
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Partner Name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                                className="w-full p-3 rounded-xl bg-transparent border border-[var(--color-text)]/20 outline-none focus:border-[var(--color-text)]"
+                            />
+
+                            <input
+                                type="url"
+                                name="website"
+                                placeholder="Website URL"
+                                value={formData.website}
+                                onChange={handleChange}
+                                className="w-full p-3 rounded-xl bg-transparent border border-[var(--color-text)]/20 outline-none focus:border-[var(--color-text)]"
+                            />
+
+                            <textarea
+                                name="description"
+                                placeholder="Description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                rows="4"
+                                className="w-full p-3 rounded-xl bg-transparent border border-[var(--color-text)]/20 outline-none focus:border-[var(--color-text)]"
+                            />
+
+                            <select
+                                name="type"
+                                value={formData.type}
+                                onChange={handleChange}
+                                className="
+                                    w-full p-3 rounded-xl
+                                    bg-[var(--color-bg)]
+                                    text-[var(--color-text)]
+                                    border border-[var(--color-text)]/20
+                                "
                             >
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Partner Name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full p-3 rounded-xl bg-transparent border border-[var(--color-text)]/20 outline-none focus:border-[var(--color-text)]"
-                                />
 
-                                <input
-                                    type="url"
-                                    name="website"
-                                    placeholder="Website URL"
-                                    value={formData.website}
-                                    onChange={handleChange}
-                                    className="w-full p-3 rounded-xl bg-transparent border border-[var(--color-text)]/20 outline-none focus:border-[var(--color-text)]"
-                                />
+                                <option value="">
+                                    Select Type
+                                </option>
 
-                                <textarea
-                                    name="description"
-                                    placeholder="Description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    rows="4"
-                                    className="w-full p-3 rounded-xl bg-transparent border border-[var(--color-text)]/20 outline-none focus:border-[var(--color-text)]"
-                                />
+                                <option value="studio">
+                                    Studio
+                                </option>
 
-                                <select
-                                    name="type"
-                                    value={formData.type}
-                                    onChange={handleChange}
-    className="
-        w-full p-3 rounded-xl
-        bg-[var(--color-bg)]
-        text-[var(--color-text)]
-        border border-[var(--color-text)]/20
-    "                            >
-                                    <option value="">Select Type</option>
-                                    <option value="studio">Studio</option>
-                                    <option value="sponsor">Sponsor</option>
-                                    <option value="platform">Platform</option>
-                                </select>
+                                <option value="sponsor">
+                                    Sponsor
+                                </option>
 
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) =>
-                                        setLogo(e.target.files[0])
-                                    }
-                                    className="w-full text-sm"
-                                />
+                                <option value="platform">
+                                    Platform
+                                </option>
+
+                            </select>
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                    setLogo(e.target.files[0])
+                                }
+                                className="w-full text-sm"
+                            />
+
+                            <div className="flex gap-4">
 
                                 <button
                                     type="submit"
-                                    className="w-full py-3 rounded-xl bg-[var(--color-text)] text-[var(--color-bg)] font-semibold hover:scale-[1.02] transition"
+                                    className="flex-1 py-3 rounded-xl bg-[var(--color-text)] text-[var(--color-bg)] font-semibold hover:scale-[1.02] transition"
                                 >
-                                    Create Partner
+
+                                    {editingId
+                                        ? "Update Partner"
+                                        : "Create Partner"}
+
                                 </button>
-                            </form>
-                        </div>
 
-                        {/* PARTNER LIST */}
-                        <div className="w-full grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {editingId && (
 
-                            {partners.map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="bg-[var(--color-bg-section)] border border-[var(--color-text)]/10 rounded-2xl p-6 shadow-lg hover:scale-[1.02] transition"
-                                >
-                                    {item.logo && (
-                                        <img
-                                            src={`http://localhost:5000${item.logo}`}
-                                            alt={item.name}
-                                            className="w-28 h-28 object-contain mb-5 mx-auto"
-                                        />
-                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={resetForm}
+                                        className="px-6 py-3 rounded-xl border border-[var(--color-text)]/20"
+                                    >
+                                        Cancel
+                                    </button>
 
-                                    <h3 className="text-xl font-semibold text-center">
-                                        {item.name}
-                                    </h3>
+                                )}
 
-                                    <p className="text-center opacity-60 text-sm mt-2 uppercase tracking-wide">
-                                        {item.type}
-                                    </p>
+                            </div>
 
-                                    {item.website && (
-                                        <a
-                                            href={item.website}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="block text-center mt-4 underline opacity-80 hover:opacity-100"
-                                        >
-                                            Visit Website
-                                        </a>
-                                    )}
+                        </form>
+
+                    </div>
+
+                    {/* PARTNER LIST */}
+                    <div className="w-full grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                        {partners.map((item) => (
+
+                            <div
+                                key={item.id}
+                                className="bg-[var(--color-bg-section)] border border-[var(--color-text)]/10 rounded-2xl p-6 shadow-lg hover:scale-[1.02] transition"
+                            >
+
+                                {item.logo && (
+
+                                    <img
+                                         src={`${BASE_URL}${item.logo}`}
+                                        alt={item.name}
+                                        className="w-28 h-28 object-contain mb-5 mx-auto"
+                                    />
+
+                                )}
+
+                                <h3 className="text-xl font-semibold text-center">
+                                    {item.name}
+                                </h3>
+
+                                <p className="text-center opacity-60 text-sm mt-2 uppercase tracking-wide">
+                                    {item.type}
+                                </p>
+
+                                {item.website && (
+
+                                    <a
+                                        href={item.website}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="block text-center mt-4 underline opacity-80 hover:opacity-100"
+                                    >
+                                        Visit Website
+                                    </a>
+
+                                )}
+
+                                <div className="flex gap-3 mt-6">
+
+                                    <button
+                                        onClick={() => handleEdit(item)}
+                                        className="flex-1 py-3 rounded-xl border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition"
+                                    >
+                                        Edit
+                                    </button>
 
                                     <button
                                         onClick={() =>
                                             handleDelete(item.id)
                                         }
-                                        className="w-full mt-6 py-3 rounded-xl border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition"
+                                        className="flex-1 py-3 rounded-xl border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition"
                                     >
                                         Delete
                                     </button>
+
                                 </div>
-                            ))}
 
-                        </div>
+                            </div>
+
+                        ))}
+
                     </div>
-                </div>
-            </div>
-        );
-    };
 
-    export default AdminPartners;
+                </div>
+
+            </div>
+
+        </div>
+    );
+};
+
+export default AdminPartners;

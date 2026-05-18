@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { forgotPassword } from "../api/authApi";
+import { forgotPassword } from "../utils/auth";
 
 const useForgotPassword = () => {
 

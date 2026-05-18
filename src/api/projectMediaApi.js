@@ -7,9 +7,13 @@ export const getProjectMedia = async (projectId) => {
 };
 
 
-// ADD MEDIA
+// ADD MEDIA (MULTER UPLOAD)
 export const addProjectMedia = async (data) => {
-    return await API.post("/project-media", data);
+    return await API.post("/project-media", data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 };
 
 

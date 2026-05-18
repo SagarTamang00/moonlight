@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
     CalendarDays,
     ArrowUpRight,
@@ -6,14 +7,13 @@ import {
 } from "lucide-react";
 
 import useNewsBlogs from "../../hooks/useNewsBlogs";
-
-const API_BASE = "http://localhost:5000";
+import { BASE_URL } from "../../utils/api";
 
 const News = () => {
 
     const { news, loading } = useNewsBlogs();
 
-    // BACK TO HOME + FULL REFRESH
+    // BACK TO HOME
     const handleBackHome = () => {
         window.location.href = "/";
     };
@@ -53,7 +53,7 @@ const News = () => {
 
                 </div>
 
-                {/* Header */}
+                {/* HEADER */}
                 <div className="mb-20 text-center">
 
                     <p className="text-[11px] uppercase tracking-[0.4em] text-white/40 mb-4">
@@ -72,32 +72,38 @@ const News = () => {
                     </h1>
 
                     <div className="w-24 h-px bg-white/20 mx-auto mt-8" />
+
                 </div>
 
                 {/* EMPTY STATE */}
                 {news.length === 0 && (
+
                     <div className="text-center text-white/50 text-xl py-32">
                         No News Available
                     </div>
+
                 )}
 
                 {/* FEATURED NEWS */}
                 {news.length > 0 && (
+
                     <div className="grid lg:grid-cols-2 gap-10 items-center mb-24">
 
-                        {/* Image */}
+                        {/* IMAGE */}
                         <div className="relative overflow-hidden rounded-3xl border border-white/10">
 
                             <img
-                                src={`${API_BASE}${news[0].news_poster}`}
+                                src={`${BASE_URL}${news[0].news_poster}`}
+
                                 alt={news[0].title}
                                 className="w-full h-[500px] object-cover"
                             />
 
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
                         </div>
 
-                        {/* Content */}
+                        {/* CONTENT */}
                         <div>
 
                             <span className="inline-block text-[10px] tracking-[0.3em] uppercase text-white/50 border border-white/10 rounded-full px-4 py-2 mb-6">
@@ -109,31 +115,38 @@ const News = () => {
                             </h2>
 
                             <div className="flex items-center gap-3 text-white/40 text-sm mb-6">
+
                                 <CalendarDays size={16} />
+
                                 <span>Latest Update</span>
+
                             </div>
 
-                            <p className="text-white/65 leading-relaxed text-lg mb-8">
+                            <p className="text-white/65 leading-relaxed text-lg mb-8 line-clamp-4">
                                 {news[0].description}
                             </p>
 
                             {news[0].news_link && (
+
                                 <a
                                     href={news[0].news_link}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="group inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm uppercase tracking-[0.25em] text-white transition-all duration-500 hover:bg-white hover:text-black"
                                 >
+
                                     Read Article
 
                                     <ArrowUpRight
                                         size={18}
                                         className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
                                     />
+
                                 </a>
                             )}
 
                         </div>
+
                     </div>
                 )}
 
@@ -147,19 +160,20 @@ const News = () => {
                             className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl transition-all duration-500 hover:border-white/20 hover:-translate-y-2"
                         >
 
-                            {/* Image */}
+                            {/* IMAGE */}
                             <div className="relative overflow-hidden">
 
                                 <img
-                                    src={`${API_BASE}${item.news_poster}`}
+                                    src={item.news_poster}
                                     alt={item.title}
                                     className="h-[280px] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
 
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+
                             </div>
 
-                            {/* Content */}
+                            {/* CONTENT */}
                             <div className="p-8">
 
                                 <div className="flex items-center justify-between mb-5">
@@ -169,8 +183,11 @@ const News = () => {
                                     </span>
 
                                     <div className="flex items-center gap-2 text-white/35 text-xs">
+
                                         <CalendarDays size={14} />
-                                        Latest
+
+                                        <span>Latest</span>
+
                                     </div>
 
                                 </div>
@@ -179,32 +196,38 @@ const News = () => {
                                     {item.title}
                                 </h3>
 
-                                <p className="text-white/55 leading-relaxed mb-6">
+                                <p className="text-white/65 leading-relaxed text-lg mb-8 line-clamp-4">
                                     {item.description}
                                 </p>
 
                                 {item.news_link && (
+
                                     <a
                                         href={item.news_link}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="group/btn inline-flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-white/70 hover:text-white transition-colors duration-300"
                                     >
+
                                         Read More
 
                                         <ArrowUpRight
                                             size={16}
                                             className="transition-transform duration-300 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1"
                                         />
+
                                     </a>
                                 )}
 
                             </div>
-                        </div>
 
+                        </div>
                     ))}
+
                 </div>
+
             </div>
+
         </section>
     );
 };

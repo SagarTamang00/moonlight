@@ -47,6 +47,8 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   transition: background 0.35s ease, color 0.35s ease;
+    overflow: hidden !important;
+
 }
 
 ::-webkit-scrollbar {

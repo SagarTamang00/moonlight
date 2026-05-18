@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getNewsBlogs } from "../api/newsBlogApi";
 
 const useNewsBlogs = () => {
@@ -6,31 +6,31 @@ const useNewsBlogs = () => {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    // ✅ reusable fetch function
+    const fetchNews = useCallback(async () => {
+        try {
+            setLoading(true);
 
-        const fetchNews = async () => {
+            const res = await getNewsBlogs();
 
-            try {
+            setNews(res.data.data); // adjust if backend structure differs
 
-                const res = await getNewsBlogs();
-                setNews(res.data.data);
-
-            } catch (err) {
-
-                console.log(err);
-
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchNews();
-
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchNews();
+    }, [fetchNews]);
 
     return {
         news,
-        loading
+        loading,
+        fetchNews,   // 👈 THIS replaces window.reload
+        setNews      // optional (for instant UI update)
     };
 };
 

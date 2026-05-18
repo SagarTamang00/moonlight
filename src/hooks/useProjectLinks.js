@@ -1,45 +1,42 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useCallback } from "react";
 import { getProjectLinks } from "../api/projectLinkApi";
-
 
 const useProjectLinks = (projectId) => {
 
     const [links, setLinks] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const [loading, setLoading] = useState(true);
+    // ✅ reusable fetch
+    const fetchLinks = useCallback(async () => {
 
+        if (!projectId) {
+            setLinks([]);
+            return;
+        }
 
-    useEffect(() => {
+        try {
+            setLoading(true);
 
-        if (!projectId) return;
+            const res = await getProjectLinks(projectId);
 
-        const fetchLinks = async () => {
+            setLinks(res.data.data);
 
-            try {
-
-                const res = await getProjectLinks(projectId);
-
-                setLinks(res.data.data);
-
-            } catch (err) {
-
-                console.log(err);
-
-            } finally {
-
-                setLoading(false);
-            }
-        };
-
-        fetchLinks();
-
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
     }, [projectId]);
 
+    useEffect(() => {
+        fetchLinks();
+    }, [fetchLinks]);
 
     return {
         links,
-        loading
+        loading,
+        setLinks,
+        fetchLinks   // 👈 IMPORTANT
     };
 };
 

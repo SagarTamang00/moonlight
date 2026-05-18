@@ -1,24 +1,37 @@
 import axios from "axios";
 
-export const BASE_URL = `http://${window.location.hostname}:5000`;
+// AUTO DETECT HOST
+const hostname = window.location.hostname;
+
+// DYNAMIC BASE URL
+export const BASE_URL =
+  hostname === "localhost"
+    ? "http://localhost:5000"
+    : `http://${hostname}:5000`;
 
 const API = axios.create({
-    baseURL: `${BASE_URL}/api`
+  baseURL: `${BASE_URL}/api`,
 });
 
+// REQUEST INTERCEPTOR
 API.interceptors.request.use((req) => {
-    const token = localStorage.getItem("token");
 
-    if (token) {
-        req.headers.Authorization = `Bearer ${token}`;
-    }
+  const token = localStorage.getItem("token");
 
-    // Prevent caching on all GET requests to ensure auto-refresh works in dashboard
-    if (req.method.toLowerCase() === 'get') {
-        req.params = { ...req.params, _t: new Date().getTime() };
-    }
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
 
-    return req;
+  // PREVENT CACHING
+  if (req.method?.toLowerCase() === "get") {
+
+    req.params = {
+      ...req.params,
+      _t: Date.now(),
+    };
+  }
+
+  return req;
 });
 
 export default API;

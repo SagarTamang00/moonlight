@@ -1,45 +1,45 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useCallback } from "react";
 import { getProjectMedia } from "../api/projectMediaApi";
-
 
 const useProjectMedia = (projectId) => {
 
     const [media, setMedia] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const [loading, setLoading] = useState(true);
+    // FETCH MEDIA
+    const fetchMedia = useCallback(async () => {
 
+        if (!projectId) {
+            setMedia([]);
+            return;
+        }
 
-    useEffect(() => {
+        try {
+            setLoading(true);
 
-        if (!projectId) return;
+            const res = await getProjectMedia(projectId);
 
-        const fetchMedia = async () => {
+            setMedia(res?.data?.data || []);
 
-            try {
-
-                const res = await getProjectMedia(projectId);
-
-                setMedia(res.data.data);
-
-            } catch (err) {
-
-                console.log(err);
-
-            } finally {
-
-                setLoading(false);
-            }
-        };
-
-        fetchMedia();
-
+        } catch (err) {
+            console.log(err);
+            setMedia([]);
+        } finally {
+            setLoading(false);
+        }
     }, [projectId]);
 
+    useEffect(() => {
+        fetchMedia();
+    }, [fetchMedia]);
 
     return {
         media,
-        loading
+        setMedia,
+
+        loading,
+
+        fetchMedia, // manual refresh after upload/delete
     };
 };
 

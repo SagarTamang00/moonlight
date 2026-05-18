@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Collaboration } from './Collaboration'
+import  Collaboration  from './Collaboration'
 
 export const Header = () => {
   const [isMuted, setIsMuted] = useState(true)
