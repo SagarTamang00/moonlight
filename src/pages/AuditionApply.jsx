@@ -10,6 +10,7 @@ const AuditionApply = () => {
 
     const [formData, setFormData] = useState({
         name: "",
+        age: "",
         email: "",
         phone: "",
         location: "",
@@ -75,6 +76,7 @@ const AuditionApply = () => {
             // RESET FORM
             setFormData({
                 name: "",
+                age: "",
                 email: "",
                 phone: "",
                 location: "",
@@ -163,6 +165,20 @@ const AuditionApply = () => {
                                         name="name"
                                         placeholder="Enter your full name"
                                         value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full h-11 sm:h-12 lg:h-14 px-4 sm:px-5 rounded-xl sm:rounded-2xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-white/25 outline-none focus:border-white/30 transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs sm:text-sm text-white/70 mb-2 sm:mb-3">
+                                        Age
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="age"
+                                        placeholder="Enter your age"
+                                        value={formData.age}
                                         onChange={handleChange}
                                         required
                                         className="w-full h-11 sm:h-12 lg:h-14 px-4 sm:px-5 rounded-xl sm:rounded-2xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-white/25 outline-none focus:border-white/30 transition-all"
