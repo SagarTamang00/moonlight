@@ -85,7 +85,7 @@ const TeamMemberModal = ({ member, onClose }) => {
       />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-4xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in fade-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[85vh] animate-in fade-in zoom-in-95 duration-300">
 
         {/* Close Button */}
         <button
@@ -96,21 +96,32 @@ const TeamMemberModal = ({ member, onClose }) => {
         </button>
 
         {/* Image Section */}
-        <div className="w-full md:w-2/5 h-[40vh] md:h-auto relative shrink-0">
+        <div className="w-full md:w-2/5 h-[50vh] md:h-auto relative shrink-0 group overflow-hidden">
           {member.image ? (
             <img
               src={`${BASE_URL}${member.image}`}
               alt={member.name}
-              className="absolute inset-0 w-full h-full object-cover grayscale"
+              className="
+                absolute inset-0
+                w-full h-full
+                object-cover
+                grayscale
+                transition-all duration-700 ease-out
+                group-hover:grayscale-0
+                group-hover:scale-105
+                active:grayscale-0
+                active:scale-105
+              "
             />
           ) : (
             <div className="absolute inset-0 bg-neutral-900" />
           )}
+
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-[#0a0a0a]" />
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 p-8 sm:p-10 lg:p-14 overflow-y-auto flex flex-col justify-center">
+        <div className="flex-1 p-8 sm:p-12 lg:p-16 overflow-y-auto flex flex-col justify-center">
 
           <div className="w-12 h-px bg-white/20 mb-8" />
 

@@ -7,6 +7,9 @@ import {
   deleteProject,
   updateProject,
 } from "../api/projectApi";
+import { BASE_URL } from "../utils/api";
+import { useRef } from "react";
+
 
 const AdminProjects = () => {
   const { projects, loading } =
@@ -29,6 +32,7 @@ const AdminProjects = () => {
     status: "upcoming",
     featured: false,
   });
+  const formRef = useRef(null);
 
   const [poster, setPoster] =
     useState(null);
@@ -101,6 +105,11 @@ const AdminProjects = () => {
       status: project.status || "upcoming",
       featured: project.featured ? true : false,
     });
+          formRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    
   };
   // DELETE PROJECT
   const handleDelete = async (id) => {
@@ -163,7 +172,9 @@ const AdminProjects = () => {
       </div>
 
       {/* CREATE FORM */}
-      <div className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10">
+      <div 
+        ref={formRef}
+ className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10">
 
         <form
           onSubmit={handleSubmit}
@@ -401,7 +412,8 @@ const AdminProjects = () => {
 
             {/* IMAGE */}
             <img
-              src={`http://localhost:5000${project.poster}`}
+              src={`${BASE_URL}${project.poster}`}
+
               alt={project.title}
               className="w-full h-[260px] object-cover"
             />
@@ -431,13 +443,11 @@ const AdminProjects = () => {
               </p>
 
               {/* FEATURED */}
-              {project.featured && (
+              {!!project.featured && (
                 <div className="mb-5">
-
                   <span className="inline-flex items-center px-3 py-1 rounded-full border border-black dark:border-white text-black dark:text-white text-xs font-medium">
                     Featured
                   </span>
-
                 </div>
               )}
               {/* EDIT BUTTON */}

@@ -3,34 +3,41 @@ import useSocialLinks from "../hooks/useSocialLinks";
 import { createSocialLink, deleteSocialLink } from "../api/socialLinks";
 import PopupModal from "./PopupModal";
 
+import {
+    FaInstagram, FaXTwitter, FaGithub, FaLinkedin, FaYoutube,
+    FaTiktok, FaDiscord, FaDribbble, FaBehance, FaFacebook,
+    FaVimeo, FaTwitch, FaPinterest, FaSnapchat, FaReddit,
+    FaTelegram, FaWhatsapp, FaGlobe,
+} from "react-icons/fa6";
+
 const ICON_MAP = {
-    instagram: 'ti-brand-instagram',
-    ig: 'ti-brand-instagram',
-    x: 'ti-brand-twitter',
-    twitter: 'ti-brand-twitter',
-    github: 'ti-brand-github',
-    git: 'ti-brand-github',
-    linkedin: 'ti-brand-linkedin',
-    youtube: 'ti-brand-youtube',
-    yt: 'ti-brand-youtube',
-    tiktok: 'ti-brand-tiktok',
-    discord: 'ti-brand-discord',
-    dribbble: 'ti-brand-dribbble',
-    behance: 'ti-brand-behance',
-    facebook: 'ti-brand-facebook',
-    vimeo: 'ti-brand-vimeo',
-    twitch: 'ti-brand-twitch',
-    pinterest: 'ti-brand-pinterest',
-    snapchat: 'ti-brand-snapchat',
-    reddit: 'ti-brand-reddit',
-    telegram: 'ti-brand-telegram',
-    whatsapp: 'ti-brand-whatsapp',
-}
+    instagram: FaInstagram,
+    ig:        FaInstagram,
+    x:         FaXTwitter,
+    twitter:   FaXTwitter,
+    github:    FaGithub,
+    git:       FaGithub,
+    linkedin:  FaLinkedin,
+    youtube:   FaYoutube,
+    yt:        FaYoutube,
+    tiktok:    FaTiktok,
+    discord:   FaDiscord,
+    dribbble:  FaDribbble,
+    behance:   FaBehance,
+    facebook:  FaFacebook,
+    vimeo:     FaVimeo,
+    twitch:    FaTwitch,
+    pinterest: FaPinterest,
+    snapchat:  FaSnapchat,
+    reddit:    FaReddit,
+    telegram:  FaTelegram,
+    whatsapp:  FaWhatsapp,
+};
 
-function getPlatformIcon(platform) {
-    return ICON_MAP[platform?.toLowerCase()] || 'ti-world'
+function PlatformIcon({ platform, className = "text-xl" }) {
+    const Icon = ICON_MAP[platform?.toLowerCase()] ?? FaGlobe;
+    return <Icon className={className} />;
 }
-
 const AdminSocialLinks = () => {
     const { links, loading, refetch } = useSocialLinks();
 
@@ -163,7 +170,7 @@ const AdminSocialLinks = () => {
                         {platform.trim() && (
                             <div className="md:col-span-3 flex items-center gap-3 px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
                                 <div className="w-10 h-10 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-black dark:text-white flex-shrink-0">
-                                    <i className={`ti ${getPlatformIcon(platform)} text-xl`} />
+                                    <PlatformIcon platform={platform} />
                                 </div>
                                 <div>
                                     <p className="text-xs text-neutral-500 dark:text-neutral-400">Icon preview</p>
@@ -185,7 +192,7 @@ const AdminSocialLinks = () => {
                     {links.length === 0 && (
                         <div className="bg-white dark:bg-[#0b0b0b] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-10 text-center">
                             <div className="w-14 h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center mx-auto mb-4">
-                                <i className="ti ti-link-off text-2xl text-neutral-400" />
+                                <TbWorld className="text-2xl text-neutral-400" />
                             </div>
                             <h3 className="text-lg font-medium text-black dark:text-white mb-1">No links added</h3>
                             <p className="text-sm text-neutral-500 dark:text-neutral-400">Add your social platforms above</p>
@@ -199,10 +206,9 @@ const AdminSocialLinks = () => {
                         >
                             {/* Left */}
                             <div className="flex items-center gap-4 min-w-0">
-
                                 {/* Icon */}
                                 <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-black dark:text-white flex-shrink-0">
-                                    <i className={`ti ${getPlatformIcon(item.platform)} text-xl`} />
+                                    <PlatformIcon platform={item.platform} />
                                 </div>
 
                                 {/* Content */}
@@ -210,8 +216,8 @@ const AdminSocialLinks = () => {
                                     <h3 className="text-sm font-semibold text-black dark:text-white capitalize">
                                         {item.platform}
                                     </h3>
-
-                                    <a href={item.url}
+                                    <a
+                                        href={item.url}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white truncate block transition-colors"
@@ -222,7 +228,7 @@ const AdminSocialLinks = () => {
                             </div>
 
                             {/* Delete */}
-                            < button
+                            <button
                                 onClick={() => confirmDelete(item.id)}
                                 className="w-10 h-10 rounded-xl border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900 hover:bg-red-50 dark:hover:bg-red-950 transition-all flex-shrink-0"
                             >
@@ -233,8 +239,8 @@ const AdminSocialLinks = () => {
                         </div>
                     ))}
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 

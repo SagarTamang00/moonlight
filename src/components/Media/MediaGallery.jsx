@@ -109,7 +109,7 @@ export const MediaGallery = () => {
   const sectionRef = useRef(null);
   const scrollRef = useRef(null);
   const firstHalfRef = useRef(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const isHovered = useRef(false);
   const { projects } = useProjects();
 
   const allProjects = projects || [];
@@ -143,7 +143,7 @@ export const MediaGallery = () => {
       container.scrollLeft = 0;
 
       const scroll = () => {
-        if (!isHovered) {
+        if (!isHovered.current) {
           exactScrollRef.current += 0.8;
           if (exactScrollRef.current >= loopWidthRef.current) {
             exactScrollRef.current = 0;
@@ -163,9 +163,7 @@ export const MediaGallery = () => {
       clearTimeout(timer);
       cancelAnimationFrame(animationId);
     };
-  }, [isHovered, allProjects.length]);
-
-  if (allProjects.length === 0) return null;
+  }, [allProjects.length]);
 
   let cardIndex = 0;
 
@@ -191,10 +189,10 @@ export const MediaGallery = () => {
       <div className="relative z-10 w-full max-w-[100vw] overflow-hidden">
         <div
           ref={scrollRef}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onTouchStart={() => setIsHovered(true)}
-          onTouchEnd={() => setIsHovered(false)}
+          onMouseEnter={() => (isHovered.current = true)}
+          onMouseLeave={() => (isHovered.current = false)}
+          onTouchStart={() => (isHovered.current = true)}
+          onTouchEnd={() => (isHovered.current = false)}
           className="flex gap-4 sm:gap-6 overflow-x-auto px-6 sm:px-10 lg:px-16 pb-16 pt-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
         >
           <div ref={firstHalfRef} className="flex gap-4 sm:gap-6 shrink-0">

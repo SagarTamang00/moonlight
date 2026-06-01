@@ -164,7 +164,8 @@ const News = () => {
                             <div className="relative overflow-hidden">
 
                                 <img
-                                    src={item.news_poster}
+                                
+                                    src={`${BASE_URL}${item.news_poster}`}
                                     alt={item.title}
                                     className="h-[280px] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />

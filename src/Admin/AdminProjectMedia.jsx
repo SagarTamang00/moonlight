@@ -7,6 +7,7 @@ import {
   addProjectMedia,
   deleteProjectMedia,
 } from "../api/projectMediaApi";
+import { BASE_URL } from "../utils/api";
 
 const AdminProjectMedia = () => {
   const { projects } = useProjects();
@@ -199,8 +200,9 @@ const AdminProjectMedia = () => {
               >
                 {/* IMAGE */}
                 <img
-                  src={`http://localhost:5000/${item.image_path}`}
+                  src={`${BASE_URL}/${item.image_path}`}
                   alt={item.title}
+
                   className="w-full h-48 object-cover rounded-2xl mb-4"
                 />
 
@@ -212,7 +214,8 @@ const AdminProjectMedia = () => {
                 {/* ACTIONS */}
                 <div className="flex gap-3">
                   <a
-                    href={`http://localhost:5000/${item.image_path}`}
+
+                    href={`${BASE_URL}${item.image_path}`}
                     target="_blank"
                     className="flex-1 text-center py-2 border rounded-xl"
                   >

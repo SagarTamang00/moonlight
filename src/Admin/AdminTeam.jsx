@@ -224,6 +224,11 @@ const AdminTeam = () => {
             setHighlightForm(true);
             setTimeout(() => setHighlightForm(false), 1500);
         }, 50);
+            // SCROLL TO TOP FORM
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
     };
 
     const handleCancelEdit = () => {

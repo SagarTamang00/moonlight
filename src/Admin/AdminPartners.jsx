@@ -8,6 +8,7 @@ import {
     updatePartner
 } from "../api/partnerApi";
 import { BASE_URL } from "../utils/api";
+import { useRef } from "react";
 
 
 const AdminPartners = () => {
@@ -26,6 +27,8 @@ const AdminPartners = () => {
         description: "",
         type: "",
     });
+    const formRef = useRef(null);
+    
 
     const [logo, setLogo] = useState(null);
 
@@ -109,12 +112,10 @@ const handleEdit = (item) => {
         description: item.description || "",
         type: item.type || "",
     });
-
-    // SCROLL TO TOP FORM
-    window.scrollTo({
-        top: 0,
+              formRef.current?.scrollIntoView({
         behavior: "smooth",
-    });
+        block: "start",
+      });
 };
 
     const handleDelete = async (id) => {
@@ -168,7 +169,9 @@ const handleEdit = (item) => {
                 <div className="flex flex-col items-center gap-14">
 
                     {/* FORM */}
-                    <div className="w-full max-w-2xl bg-[var(--color-bg-section)] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-xl">
+                    <div 
+                        ref={formRef}
+                        className="w-full max-w-2xl bg-[var(--color-bg-section)] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-xl">
 
                         <h2 className="text-xl font-semibold mb-6">
 
@@ -294,6 +297,7 @@ const handleEdit = (item) => {
                                 {item.logo && (
 
                                     <img
+                                    
                                          src={`${BASE_URL}${item.logo}`}
                                         alt={item.name}
                                         className="w-28 h-28 object-contain mb-5 mx-auto"

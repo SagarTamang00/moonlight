@@ -293,7 +293,6 @@ export const AllUpcomingProjectsPage = () => {
     return matchStatus && matchCategory;
   });
 
-  const filterOptions = ['All', 'Ongoing', 'Upcoming'];
 
   return (
     <>
@@ -347,22 +346,6 @@ export const AllUpcomingProjectsPage = () => {
               ))}
             </div>
 
-            {/* Status Filter */}
-            <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded-full border border-white/10 shrink-0">
-              {filterOptions.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => setFilter(option)}
-                  className={`px-6 py-2 rounded-full text-[10px] sm:text-xs tracking-[0.2em] uppercase transition-all duration-300 ${
-                    filter === option 
-                      ? 'bg-white text-black font-semibold shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
-                      : 'text-white/50 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
 
