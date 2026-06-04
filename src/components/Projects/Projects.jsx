@@ -1,17 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
-import useProjectMedia from '../../hooks/useProjectMedia'
-import useProjectLinks from '../../hooks/useProjectLinks'
+import { useRef, useState, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import useProjectMedia from "../../hooks/useProjectMedia";
+import useProjectLinks from "../../hooks/useProjectLinks";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 const getYouTubeEmbedUrl = (url) => {
-  if (!url) return '';
+  if (!url) return "";
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
-  return (match && match[2].length === 11)
+  return match && match[2].length === 11
     ? `https://www.youtube.com/embed/${match[2]}?autoplay=1&rel=0`
     : url;
 };
@@ -25,86 +25,129 @@ const getYouTubeEmbedUrl = (url) => {
 export const ALL_PROJECTS = [
   {
     id: 1,
-    title: 'Kathghara (कठघरा)',
-    category: 'Reality Courtroom / Political Talk Show',
-    status: 'Ongoing',
-    release: 'December 2025 (Ongoing)',
-    description: 'A legal-themed political talk show hosted by Tikaram Yatri and judged by Mithila Sharma. The program brings public figures into a courtroom dock to answer for their actions under the theme.',
-    image: '/kadhgara.jpeg',
-    network: 'Himalaya TV',
-    digital_partner: 'OSR Reality',
+    title: "Kathghara (कठघरा)",
+    category: "Reality Courtroom / Political Talk Show",
+    status: "Ongoing",
+    release: "December 2025 (Ongoing)",
+    description:
+      "A legal-themed political talk show hosted by Tikaram Yatri and judged by Mithila Sharma. The program brings public figures into a courtroom dock to answer for their actions under the theme.",
+    image: "/kadhgara.jpeg",
+    network: "Himalaya TV",
+    digital_partner: "OSR Reality",
     seasons: [
       {
         seasonNumber: 1,
-        seasonTitle: 'Season 1',
-        playlistLink: 'https://youtube.com/playlist?list=PL...',
+        seasonTitle: "Season 1",
+        playlistLink: "https://youtube.com/playlist?list=PL...",
         episodes: [
-          { id: 'k1e1', label: 'Episode 1: The Verdict', duration: '45:12', thumb: '/kadhgara.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-          { id: 'k1e2', label: 'Episode 2: Cross Examination', duration: '42:30', thumb: '/kadhgara.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-        ]
+          {
+            id: "k1e1",
+            label: "Episode 1: The Verdict",
+            duration: "45:12",
+            thumb: "/kadhgara.jpeg",
+            youtubeLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          },
+          {
+            id: "k1e2",
+            label: "Episode 2: Cross Examination",
+            duration: "42:30",
+            thumb: "/kadhgara.jpeg",
+            youtubeLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          },
+        ],
       },
       {
         seasonNumber: 2,
-        seasonTitle: 'Season 2 (Upcoming)',
-        playlistLink: 'https://youtube.com/playlist?list=PL...',
+        seasonTitle: "Season 2 (Upcoming)",
+        playlistLink: "https://youtube.com/playlist?list=PL...",
         episodes: [
-          { id: 'k2e1', label: 'Season 2 Teaser', duration: '1:30', thumb: '/kadhgara.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-        ]
-      }
-    ]
+          {
+            id: "k2e1",
+            label: "Season 2 Teaser",
+            duration: "1:30",
+            thumb: "/kadhgara.jpeg",
+            youtubeLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          },
+        ],
+      },
+    ],
   },
   {
     id: 2,
-    title: 'Sukul Guff',
-    category: 'Authentic Nepali Podcast / Cultural Conversation Show',
-    status: 'Upcoming',
-    release: 'Coming Soon',
-    description: 'A soulful Nepali-style podcast hosted by Avas Karmacharya, where meaningful conversations unfold in the heart of nature. Seated traditionally on a mat with chiya beside them, guests share stories, life experiences, ideas, and wisdom in a peaceful open-air setting.',
-    image: '/nep.jpeg',
-    network: 'Moonlight Motion Picture',
-    digital_partner: 'Moonlight Originals',
+    title: "Sukul Guff",
+    category: "Authentic Nepali Podcast / Cultural Conversation Show",
+    status: "Upcoming",
+    release: "Coming Soon",
+    description:
+      "A soulful Nepali-style podcast hosted by Avas Karmacharya, where meaningful conversations unfold in the heart of nature. Seated traditionally on a mat with chiya beside them, guests share stories, life experiences, ideas, and wisdom in a peaceful open-air setting.",
+    image: "/nep.jpeg",
+    network: "Moonlight Motion Picture",
+    digital_partner: "Moonlight Originals",
     seasons: [
       {
         seasonNumber: 1,
-        seasonTitle: 'Volume 1',
-        playlistLink: 'https://youtube.com/playlist?list=PL...',
+        seasonTitle: "Volume 1",
+        playlistLink: "https://youtube.com/playlist?list=PL...",
         episodes: [
-          { id: 'sg1e1', label: 'Episode 1: Roots', duration: '55:00', thumb: '/nep.jpeg', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-        ]
-      }
-    ]
+          {
+            id: "sg1e1",
+            label: "Episode 1: Roots",
+            duration: "55:00",
+            thumb: "/nep.jpeg",
+            youtubeLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          },
+        ],
+      },
+    ],
   },
   {
     id: 3,
-    title: 'Cine Sarga',
-    category: 'Podcast',
-    status: 'Upcoming',
-    release: '2026',
-    description: 'When the moon goes dark, so do the minds of the citizens. A gripping thriller that explores the boundaries of human consciousness.',
-    image: '/pod.jpeg',
+    title: "Cine Sarga",
+    category: "Podcast",
+    status: "Upcoming",
+    release: "2026",
+    description:
+      "When the moon goes dark, so do the minds of the citizens. A gripping thriller that explores the boundaries of human consciousness.",
+    image: "/pod.jpeg",
     videos: [
-      { id: 'e1', label: 'Offical', duration: '1:15', thumb: 'https://images.unsplash.com/photo-1532767153582-b1a0e5145009?q=80&w=1974&auto=format&fit=crop', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
-    ]
+      {
+        id: "e1",
+        label: "Offical",
+        duration: "1:15",
+        thumb:
+          "https://images.unsplash.com/photo-1532767153582-b1a0e5145009?q=80&w=1974&auto=format&fit=crop",
+        youtubeLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      },
+    ],
   },
   {
     id: 4,
-    title: 'Stardust',
-    category: 'Animated Feature',
-    status: 'Upcoming',
-    release: 'Spring 2027',
-    description: 'A beautifully animated journey of a young star trying to find its place in the cosmos. Perfect for audiences of all ages.',
-    image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2044&auto=format&fit=crop',
+    title: "Stardust",
+    category: "Animated Feature",
+    status: "Upcoming",
+    release: "Spring 2027",
+    description:
+      "A beautifully animated journey of a young star trying to find its place in the cosmos. Perfect for audiences of all ages.",
+    image:
+      "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2044&auto=format&fit=crop",
     videos: [
-      { id: 's1', label: 'Animation Sneak Peek', duration: '2:40', thumb: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2044&auto=format&fit=crop', youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
-    ]
-  }
-]
+      {
+        id: "s1",
+        label: "Animation Sneak Peek",
+        duration: "2:40",
+        thumb:
+          "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2044&auto=format&fit=crop",
+        youtubeLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      },
+    ],
+  },
+];
 
 // Homepage always shows exactly the first 3 projects
-const HOMEPAGE_PROJECTS = ALL_PROJECTS.slice(0, 3)
+const HOMEPAGE_PROJECTS = ALL_PROJECTS.slice(0, 3);
 
 // ── Shared project card ──────────────────────────────────────
-export const ProjectCard = ({ project, onClick, animClass = '' }) => (
+export const ProjectCard = ({ project, onClick, animClass = "" }) => (
   <div
     onClick={() => onClick(project)}
     className={`${animClass} group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 aspect-[4/5] cursor-pointer hover:border-white/30 transition-all duration-500`}
@@ -117,17 +160,20 @@ export const ProjectCard = ({ project, onClick, animClass = '' }) => (
       <img
         src={project.image}
         alt={project.title}
-        className="relative w-full h-full object-contain transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100 grayscale group-hover:grayscale-0 z-10"
+        className="relative w-full h-full object-contain transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100 z-10"
       />
     </div>
     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500 z-20" />
 
     {/* Status badge */}
     <div className="absolute top-4 right-4 z-30">
-      <span className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${project.status === 'Ongoing'
-        ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-        : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
-        }`}>
+      <span
+        className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${
+          project.status === "Ongoing"
+            ? "bg-emerald-500/20 border-emerald-400/40 text-emerald-300"
+            : "bg-sky-500/20 border-sky-400/40 text-sky-300"
+        }`}
+      >
         {project.status}
       </span>
     </div>
@@ -147,34 +193,36 @@ export const ProjectCard = ({ project, onClick, animClass = '' }) => (
       </div>
     </div>
   </div>
-)
+);
 
 // ── Shared project modal ─────────────────────────────────────
 export const ProjectModal = ({ project, onClose }) => {
-  const [activeVideo, setActiveVideo] = useState(null)
-  const { media, loading } = useProjectMedia(project?.id)
-  const { links } = useProjectLinks(project?.id)
-  const activeMediaData = media?.find(m => m.id === activeVideo)
+  const [activeVideo, setActiveVideo] = useState(null);
+  const { media, loading } = useProjectMedia(project?.id);
+  const { links } = useProjectLinks(project?.id);
+  const activeMediaData = media?.find((m) => m.id === activeVideo);
 
   useEffect(() => {
     if (project) {
-      document.body.style.overflow = 'hidden'
-      document.documentElement.style.overflow = 'hidden'
-      window.lenis?.stop()
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      window.lenis?.stop();
     } else {
-      document.body.style.overflow = ''
-      document.documentElement.style.overflow = ''
-      window.lenis?.start()
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      window.lenis?.start();
     }
     return () => {
-      document.body.style.overflow = ''
-      document.documentElement.style.overflow = ''
-      window.lenis?.start()
-    }
-  }, [project])
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      window.lenis?.start();
+    };
+  }, [project]);
 
   return (
-    <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-black/80 backdrop-blur-xl transition-all duration-500 ${project ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+    <div
+      className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-black/80 backdrop-blur-xl transition-all duration-500 ${project ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+    >
       {project && (
         <div
           data-lenis-prevent="true"
@@ -185,8 +233,19 @@ export const ProjectModal = ({ project, onClose }) => {
             onClick={onClose}
             className="absolute top-3 right-3 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-black/50 hover:bg-white hover:text-black transition-all duration-300 border border-white/20 text-white z-50 group"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-300">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-300"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
 
@@ -197,14 +256,23 @@ export const ProjectModal = ({ project, onClose }) => {
                   className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-125"
                   style={{ backgroundImage: `url(${project.image})` }}
                 />
-                <img src={project.image} alt={project.title} className="relative w-full h-full object-contain z-10" />
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="relative w-full h-full object-contain z-10"
+                />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/80 hidden lg:block z-20" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent lg:hidden z-20" />
                 <div className="absolute top-4 left-4 z-30">
-                  <span className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${project.status === 'Ongoing'
-                    ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-                    : 'bg-sky-500/20 border-sky-400/40 text-sky-300'
-                    }`}>{project.status}</span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-semibold border backdrop-blur-sm ${
+                      project.status === "Ongoing"
+                        ? "bg-emerald-500/20 border-emerald-400/40 text-emerald-300"
+                        : "bg-sky-500/20 border-sky-400/40 text-sky-300"
+                    }`}
+                  >
+                    {project.status}
+                  </span>
                 </div>
               </div>
             </div>
@@ -218,7 +286,7 @@ export const ProjectModal = ({ project, onClose }) => {
               </h2>
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <span className="px-3 py-1 rounded-full border border-white/20 text-[10px] sm:text-xs tracking-widest uppercase">
-                  {project.status === 'Ongoing' ? 'In Production' : 'Upcoming'}
+                  {project.status === "Ongoing" ? "In Production" : "Upcoming"}
                 </span>
                 {project.release_year && (
                   <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
@@ -227,12 +295,14 @@ export const ProjectModal = ({ project, onClose }) => {
                 )}
                 {project.seasons > 0 && (
                   <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
-                    {project.seasons} {project.seasons > 1 ? 'Seasons' : 'Season'}
+                    {project.seasons}{" "}
+                    {project.seasons > 1 ? "Seasons" : "Season"}
                   </span>
                 )}
                 {project.episodes > 0 && (
                   <span className="text-gray-400 text-[10px] sm:text-sm tracking-widest uppercase">
-                    {project.episodes} {project.episodes > 1 ? 'Episodes' : 'Episode'}
+                    {project.episodes}{" "}
+                    {project.episodes > 1 ? "Episodes" : "Episode"}
                   </span>
                 )}
                 {project.duration && (
@@ -247,25 +317,35 @@ export const ProjectModal = ({ project, onClose }) => {
 
               {/* Media (Youtube Links) */}
               <div className="border-t border-white/10 pt-6">
-                <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">Media</p>
+                <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">
+                  Media
+                </p>
 
                 <div className="flex flex-col gap-3">
                   {(() => {
                     const getYoutubeId = (url) => {
                       if (!url) return null;
-                      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                      const regExp =
+                        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
                       const match = url.match(regExp);
-                      return (match && match[2].length === 11) ? match[2] : null;
+                      return match && match[2].length === 11 ? match[2] : null;
                     };
-                    const youtubeLinks = links?.filter(link => getYoutubeId(link.url)) || [];
-                    
+                    const youtubeLinks =
+                      links?.filter((link) => getYoutubeId(link.url)) || [];
+
                     if (youtubeLinks.length === 0) {
-                      return <p className="text-sm text-white/40 italic">No media available yet.</p>;
+                      return (
+                        <p className="text-sm text-white/40 italic">
+                          No media available yet.
+                        </p>
+                      );
                     }
 
                     return youtubeLinks.map((item) => {
                       const ytId = getYoutubeId(item.url);
-                      const thumbUrl = ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : '';
+                      const thumbUrl = ytId
+                        ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`
+                        : "";
                       return (
                         <div key={item.id} className="w-full">
                           {activeVideo === item.id ? (
@@ -275,7 +355,13 @@ export const ProjectModal = ({ project, onClose }) => {
                                 className="absolute -top-2 -right-2 z-10 w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 border border-white/30 flex items-center justify-center transition-colors"
                                 aria-label="Close video"
                               >
-                                <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                                <svg
+                                  className="w-3 h-3 text-white"
+                                  viewBox="0 0 12 12"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
                                   <path d="M1 1l10 10M11 1L1 11" />
                                 </svg>
                               </button>
@@ -283,7 +369,7 @@ export const ProjectModal = ({ project, onClose }) => {
                                 <iframe
                                   className="absolute inset-0 w-full h-full"
                                   src={getYouTubeEmbedUrl(item.url)}
-                                  title={item.type || 'Video'}
+                                  title={item.type || "Video"}
                                   frameBorder="0"
                                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                   allowFullScreen
@@ -296,15 +382,27 @@ export const ProjectModal = ({ project, onClose }) => {
                               className="flex items-center gap-3 w-full p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-left"
                             >
                               <div className="w-14 h-9 rounded overflow-hidden relative shrink-0">
-                                {thumbUrl && <img src={thumbUrl} alt={item.type || 'Video'} className="w-full h-full object-cover" />}
+                                {thumbUrl && (
+                                  <img
+                                    src={thumbUrl}
+                                    alt={item.type || "Video"}
+                                    className="w-full h-full object-cover"
+                                  />
+                                )}
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                  <svg className="w-3 h-3 text-white ml-0.5" viewBox="0 0 12 12" fill="currentColor">
+                                  <svg
+                                    className="w-3 h-3 text-white ml-0.5"
+                                    viewBox="0 0 12 12"
+                                    fill="currentColor"
+                                  >
                                     <path d="M2 1.5l9 4.5-9 4.5V1.5z" />
                                   </svg>
                                 </div>
                               </div>
                               <div className="min-w-0 flex-1">
-                                <p className="text-xs text-white/90 truncate uppercase">{item.type || 'Video'}</p>
+                                <p className="text-xs text-white/90 truncate uppercase">
+                                  {item.type || "Video"}
+                                </p>
                               </div>
                               <a
                                 href={item.url}
@@ -318,7 +416,7 @@ export const ProjectModal = ({ project, onClose }) => {
                             </button>
                           )}
                         </div>
-                      )
+                      );
                     });
                   })()}
                 </div>
@@ -327,11 +425,17 @@ export const ProjectModal = ({ project, onClose }) => {
               {/* Links */}
               {links && links.length > 0 && (
                 <div className="border-t border-white/10 pt-6 mt-6">
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">External Links</p>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">
+                    External Links
+                  </p>
                   <div className="flex flex-wrap gap-3">
                     {links.map((link) => {
-                      const isYoutube = link.url && (link.url.includes('youtube.com') || link.url.includes('youtu.be'));
-                      const labelText = link.type || (isYoutube ? 'YouTube' : 'Link');
+                      const isYoutube =
+                        link.url &&
+                        (link.url.includes("youtube.com") ||
+                          link.url.includes("youtu.be"));
+                      const labelText =
+                        link.type || (isYoutube ? "YouTube" : "Link");
                       return (
                         <a
                           key={link.id}
@@ -341,13 +445,17 @@ export const ProjectModal = ({ project, onClose }) => {
                           className="flex items-center gap-2 text-[10px] uppercase tracking-widest px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 hover:text-white text-white/70 transition-colors"
                         >
                           {isYoutube && (
-                            <svg className="w-3.5 h-3.5 text-white/80" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.134 0 12 0 12s0 3.866.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.866 24 12 24 12s0-3.866-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            <svg
+                              className="w-3.5 h-3.5 text-white/80"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.134 0 12 0 12s0 3.866.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.866 24 12 24 12s0-3.866-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                             </svg>
                           )}
                           {labelText} ↗
                         </a>
-                      )
+                      );
                     })}
                   </div>
                 </div>
@@ -357,41 +465,59 @@ export const ProjectModal = ({ project, onClose }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-import useProjects from '../../hooks/useProjects'
-import { BASE_URL } from '../../utils/api'
+import useProjects from "../../hooks/useProjects";
+import { BASE_URL } from "../../utils/api";
 
 // ── Homepage section ─────────────────────────────────────────
 export const Projects = ({ onNavigateToAll }) => {
-  const sectionRef = useRef(null)
-  const [selectedProject, setSelectedProject] = useState(null)
+  const sectionRef = useRef(null);
+  const [selectedProject, setSelectedProject] = useState(null);
 
-  const { projects } = useProjects()
+  const { projects } = useProjects();
 
   // Filter for upcoming/ongoing, take top 3
-  const activeProjects = projects?.filter(p => p.status === 'upcoming' || p.status === 'ongoing') || []
-  const homepageProjects = activeProjects.slice(0, 3)
+  const activeProjects =
+    projects?.filter(
+      (p) => p.status === "upcoming" || p.status === "ongoing",
+    ) || [];
+  const homepageProjects = activeProjects.slice(0, 3);
 
-  useGSAP(() => {
-    ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top 60%',
-      onEnter: () => {
-        gsap.to('.projects-title', { opacity: 1, y: 0, duration: 1, ease: 'power3.out' })
-        gsap.to('.project-card', {
-          opacity: 1, y: 0, duration: 0.8,
-          stagger: 0.2, ease: 'power3.out', delay: 0.3
-        })
-      }
-    })
-  }, { scope: sectionRef, dependencies: [projects] })
+  useGSAP(
+    () => {
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top 60%",
+        onEnter: () => {
+          gsap.to(".projects-title", {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
+          gsap.to(".project-card", {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power3.out",
+            delay: 0.3,
+          });
+        },
+      });
+    },
+    { scope: sectionRef, dependencies: [projects] },
+  );
 
   return (
-    <section ref={sectionRef} id="projects-section" className="relative min-h-[100dvh] w-full flex items-center justify-center py-20">
+    <section
+      ref={sectionRef}
+      id="projects-section"
+      className="relative min-h-[100dvh] w-full flex items-center justify-center py-20"
+    >
       <div className="relative z-10 w-full max-w-[95vw] lg:max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 flex flex-col items-center">
-
         <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-cinematic mb-12 lg:mb-20 text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-900 opacity-0 projects-title translate-y-8 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] text-center">
           UPCOMING / ONGOING HIGHLIGHTS
         </h2>
@@ -404,17 +530,23 @@ export const Projects = ({ onNavigateToAll }) => {
               project={{
                 ...project,
                 category: project.category_name,
-                image: project.poster ? `${BASE_URL}${project.poster}` : '',
+                image: project.poster ? `${BASE_URL}${project.poster}` : "",
                 release: project.release_year,
-                status: project.status.charAt(0).toUpperCase() + project.status.slice(1)
+                status:
+                  project.status.charAt(0).toUpperCase() +
+                  project.status.slice(1),
               }}
-              onClick={() => setSelectedProject({
-                ...project,
-                category: project.category_name,
-                image: project.poster ? `${BASE_URL}${project.poster}` : '',
-                release: project.release_year,
-                status: project.status.charAt(0).toUpperCase() + project.status.slice(1)
-              })}
+              onClick={() =>
+                setSelectedProject({
+                  ...project,
+                  category: project.category_name,
+                  image: project.poster ? `${BASE_URL}${project.poster}` : "",
+                  release: project.release_year,
+                  status:
+                    project.status.charAt(0).toUpperCase() +
+                    project.status.slice(1),
+                })
+              }
               animClass="project-card opacity-0 translate-y-12"
             />
           ))}
@@ -428,17 +560,30 @@ export const Projects = ({ onNavigateToAll }) => {
           >
             <span className="relative z-10 group-hover:text-black transition-colors duration-300 flex items-center gap-3">
               See All Projects
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
+                />
               </svg>
             </span>
             <div className="absolute inset-0 w-full h-full bg-white scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out" />
           </a>
-
         </div>
       </div>
 
-      <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      <ProjectModal
+        project={selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
     </section>
-  )
-}
+  );
+};

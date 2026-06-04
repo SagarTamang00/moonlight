@@ -39,6 +39,7 @@ import Collaboration from './components/Header/Collaboration'
 import AuditionApply from "./pages/AuditionApply";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import { BackToTop } from "./components/BackToTop/BackToTop";
 
 
 
@@ -264,6 +265,7 @@ function App() {
               <MediaGallery />
               <Partners />
               <Footer />
+              <BackToTop />
             </div>
 
           </div>

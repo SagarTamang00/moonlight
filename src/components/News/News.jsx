@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
     CalendarDays,
     ArrowUpRight,
@@ -8,6 +6,7 @@ import {
 
 import useNewsBlogs from "../../hooks/useNewsBlogs";
 import { BASE_URL } from "../../utils/api";
+import { BackToTop } from "../BackToTop/BackToTop";
 
 const News = () => {
 
@@ -229,6 +228,7 @@ const News = () => {
 
             </div>
 
+            <BackToTop />
         </section>
     );
 };
