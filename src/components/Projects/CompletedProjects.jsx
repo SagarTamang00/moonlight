@@ -5,6 +5,8 @@ import { useGSAP } from "@gsap/react";
 import { Link } from "react-router-dom";
 import useProjects from "../../hooks/useProjects";
 import useProjectLinks from "../../hooks/useProjectLinks";
+import { BackToTop } from "../BackToTop/BackToTop";
+
 import { BASE_URL } from "../../utils/api";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -488,6 +490,7 @@ export const CompletedProjects = () => {
           })}
         </div>
       </div>
+      <BackToTop />
     </section>
   );
 };

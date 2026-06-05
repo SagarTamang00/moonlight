@@ -2,21 +2,14 @@ import { useState } from "react";
 
 import useProjects from "../hooks/useProjects";
 import useProjectCategories from "../hooks/useProjectCategories";
-import {
-  createProject,
-  deleteProject,
-  updateProject,
-} from "../api/projectApi";
+import { createProject, deleteProject, updateProject } from "../api/projectApi";
 import { BASE_URL } from "../utils/api";
 import { useRef } from "react";
 
-
 const AdminProjects = () => {
-  const { projects, loading } =
-    useProjects();
+  const { projects, loading } = useProjects();
 
-  const { categories } =
-    useProjectCategories();
+  const { categories } = useProjectCategories();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -34,24 +27,15 @@ const AdminProjects = () => {
   });
   const formRef = useRef(null);
 
-  const [poster, setPoster] =
-    useState(null);
+  const [poster, setPoster] = useState(null);
 
   // HANDLE INPUT CHANGE
   const handleChange = (e) => {
-    const {
-      name,
-      value,
-      type,
-      checked,
-    } = e.target;
+    const { name, value, type, checked } = e.target;
 
     setFormData({
       ...formData,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
@@ -86,7 +70,9 @@ const AdminProjects = () => {
       window.location.reload();
     } catch (err) {
       console.log(err);
-      alert(isEditing ? "Failed to update project" : "Failed to create project");
+      alert(
+        isEditing ? "Failed to update project" : "Failed to create project",
+      );
     }
   };
 
@@ -105,82 +91,61 @@ const AdminProjects = () => {
       status: project.status || "upcoming",
       featured: project.featured ? true : false,
     });
-          formRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    
+    formRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
   // DELETE PROJECT
   const handleDelete = async (id) => {
-
-    const confirmDelete =
-      window.confirm(
-        "Are you sure you want to delete this project?"
-      );
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this project?",
+    );
 
     if (!confirmDelete) return;
 
     try {
-
       await deleteProject(id);
 
-      alert(
-        "Project deleted successfully"
-      );
+      alert("Project deleted successfully");
 
       window.location.reload();
-
     } catch (err) {
-
       console.log(err);
 
-      alert(
-        "Failed to delete project"
-      );
+      alert("Failed to delete project");
     }
   };
 
   if (loading) {
-    return (
-      <div className="p-10 text-black dark:text-white">
-        Loading...
-      </div>
-    );
+    return <div className="p-10 text-black dark:text-white">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen bg-white dark:bg-black p-6 md:p-10 transition-all duration-300">
-
       {/* HEADER */}
       <div className="mb-10">
-
         <h2
           style={{
-            fontFamily:
-              "'Syne', sans-serif",
+            fontFamily: "'Syne', sans-serif",
           }}
           className="text-3xl font-bold text-black dark:text-white"
         >
           Projects
         </h2>
 
-        <p className="text-gray-500 mt-2">
-          Create and manage projects.
-        </p>
-
+        <p className="text-gray-500 mt-2">Create and manage projects.</p>
       </div>
 
       {/* CREATE FORM */}
-      <div 
+      <div
         ref={formRef}
- className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10">
-
+        className="bg-[#f7f7f7] dark:bg-[#111111] border border-[#e5e5e5] dark:border-[#222222] rounded-3xl p-6 md:p-8 mb-10"
+      >
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-5"
         >
-
           {/* CATEGORY */}
           <div>
             <label className="block text-sm font-medium text-black dark:text-white mb-2">
@@ -189,29 +154,18 @@ const AdminProjects = () => {
 
             <select
               name="category_id"
-              value={
-                formData.category_id
-              }
+              value={formData.category_id}
               onChange={handleChange}
               required
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             >
+              <option value="">Select Category</option>
 
-              <option value="">
-                Select Category
-              </option>
-
-              {categories.map(
-                (category) => (
-
-                  <option
-                    key={category.id}
-                    value={category.id}
-                  >
-                    {category.name}
-                  </option>
-                )
-              )}
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -241,9 +195,7 @@ const AdminProjects = () => {
             <textarea
               name="description"
               placeholder="Write description..."
-              value={
-                formData.description
-              }
+              value={formData.description}
               onChange={handleChange}
               rows={5}
               className="w-full px-4 py-3 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all resize-none"
@@ -259,9 +211,7 @@ const AdminProjects = () => {
             <input
               type="file"
               accept="image/*"
-              onChange={
-                handlePosterChange
-              }
+              onChange={handlePosterChange}
               className="block w-full text-sm text-gray-600 dark:text-gray-300"
             />
           </div>
@@ -276,9 +226,7 @@ const AdminProjects = () => {
               type="text"
               name="duration"
               placeholder="2h 30m"
-              value={
-                formData.duration
-              }
+              value={formData.duration}
               onChange={handleChange}
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             />
@@ -294,9 +242,7 @@ const AdminProjects = () => {
               type="number"
               name="seasons"
               placeholder="0"
-              value={
-                formData.seasons
-              }
+              value={formData.seasons}
               onChange={handleChange}
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             />
@@ -312,9 +258,7 @@ const AdminProjects = () => {
               type="number"
               name="episodes"
               placeholder="0"
-              value={
-                formData.episodes
-              }
+              value={formData.episodes}
               onChange={handleChange}
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             />
@@ -330,9 +274,7 @@ const AdminProjects = () => {
               type="number"
               name="release_year"
               placeholder="2026"
-              value={
-                formData.release_year
-              }
+              value={formData.release_year}
               onChange={handleChange}
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             />
@@ -350,31 +292,20 @@ const AdminProjects = () => {
               onChange={handleChange}
               className="w-full h-12 px-4 rounded-2xl border border-[#dcdcdc] dark:border-[#2a2a2a] bg-white dark:bg-[#181818] text-black dark:text-white outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
             >
+              <option value="upcoming">Upcoming</option>
 
-              <option value="upcoming">
-                Upcoming
-              </option>
+              <option value="ongoing">Ongoing</option>
 
-              <option value="ongoing">
-                Ongoing
-              </option>
-
-              <option value="completed">
-                Completed
-              </option>
-
+              <option value="completed">Completed</option>
             </select>
           </div>
 
           {/* FEATURED */}
           <div className="md:col-span-2 flex items-center gap-3 pt-2">
-
             <input
               type="checkbox"
               name="featured"
-              checked={
-                formData.featured
-              }
+              checked={formData.featured}
               onChange={handleChange}
               className="w-5 h-5 accent-black dark:accent-white"
             />
@@ -382,54 +313,41 @@ const AdminProjects = () => {
             <label className="text-black dark:text-white font-medium">
               Featured Project
             </label>
-
           </div>
 
           {/* BUTTON */}
           <div className="md:col-span-2">
-
             <button
               type="submit"
               className="h-12 px-6 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-medium hover:scale-[1.02] transition-all duration-300"
             >
               {editId ? "Update Project" : "Create Project"}
             </button>
-
           </div>
-
         </form>
       </div>
 
       {/* PROJECT LIST */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
         {projects.map((project) => (
-
           <div
             key={project.id}
             className="bg-[#f8f8f8] dark:bg-[#111111] border border-[#ececec] dark:border-[#222222] rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
           >
-
             {/* IMAGE */}
             <img
               src={`${BASE_URL}${project.poster}`}
-
               alt={project.title}
               className="w-full h-[260px] object-cover"
             />
 
             {/* CONTENT */}
             <div className="p-5">
-
               {/* CATEGORY */}
               <div className="mb-3">
-
                 <span className="inline-flex items-center px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-sm font-medium">
-                  {
-                    project.category_name
-                  }
+                  {project.category_name}
                 </span>
-
               </div>
 
               {/* TITLE */}
@@ -438,9 +356,7 @@ const AdminProjects = () => {
               </h3>
 
               {/* STATUS */}
-              <p className="text-gray-500 capitalize mb-5">
-                {project.status}
-              </p>
+              <p className="text-gray-500 capitalize mb-5">{project.status}</p>
 
               {/* FEATURED */}
               {!!project.featured && (
@@ -460,16 +376,11 @@ const AdminProjects = () => {
 
               {/* DELETE */}
               <button
-                onClick={() =>
-                  handleDelete(
-                    project.id
-                  )
-                }
+                onClick={() => handleDelete(project.id)}
                 className="w-full h-11 rounded-2xl bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-all duration-300"
               >
                 Delete Project
               </button>
-
             </div>
           </div>
         ))}

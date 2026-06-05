@@ -7,22 +7,18 @@ export const BackToTop = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const totalScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
       const currentScroll = window.scrollY;
 
       if (totalScroll > 0) {
         setProgress((currentScroll / totalScroll) * 100);
       }
 
-      if (currentScroll > 300) {
-        setVisible(true);
-      } else {
-        setVisible(false);
-      }
+      setVisible(currentScroll > 300);
     };
 
     window.addEventListener("scroll", handleScroll);
-    // Initial check
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
@@ -49,11 +45,16 @@ export const BackToTop = () => {
     <button
       onClick={scrollToTop}
       className={`fixed bottom-8 right-8 z-[90] flex items-center justify-center rounded-full bg-black/60 text-white border border-white/10 backdrop-blur-md transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:border-white/35 active:scale-95 group
-        ${visible ? "opacity-100 translate-y-0 visible" : "opacity-0 translate-y-6 invisible pointer-events-none"}
+        ${
+          visible
+            ? "opacity-100 translate-y-0 visible"
+            : "opacity-0 translate-y-6 invisible pointer-events-none"
+        }
       `}
       style={{ width: `${size}px`, height: `${size}px` }}
       aria-label="Back to Top"
     >
+      {/* Progress Ring */}
       <svg
         className="absolute top-0 left-0 -rotate-90 pointer-events-none"
         width={size}
@@ -64,7 +65,7 @@ export const BackToTop = () => {
           cy={size / 2}
           r={radius}
           fill="transparent"
-          stroke="rgba(255, 255, 255, 0.08)"
+          stroke="rgba(255,255,255,0.08)"
           strokeWidth={strokeWidth}
         />
         <circle
@@ -72,7 +73,7 @@ export const BackToTop = () => {
           cy={size / 2}
           r={radius}
           fill="transparent"
-          stroke="rgba(255, 255, 255, 0.75)"
+          stroke="rgba(255,255,255,0.75)"
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
@@ -80,10 +81,26 @@ export const BackToTop = () => {
           className="transition-[stroke-dashoffset] duration-75"
         />
       </svg>
+
+      {/* Arrow */}
       <ArrowUp
         size={18}
         className="relative z-10 transition-transform duration-300 group-hover:-translate-y-0.5 text-white/70 group-hover:text-white"
       />
+
+      {/* Tooltip when at bottom */}
+      <div
+        className={`absolute bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none
+    transition-all duration-500 ease-out
+    ${progress >= 99 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+      >
+        <span
+          className="text-[10px] tracking-[0.3em] uppercase text-white/80 whitespace-nowrap"
+          style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+        >
+          Back to Top
+        </span>
+      </div>
     </button>
   );
 };

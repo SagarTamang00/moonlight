@@ -5,8 +5,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import useSocialLinks from "../../hooks/useSocialLinks";
 import useSettings from "../../hooks/useSettings";
+import { Earth3D } from "./Earth3D";
 
-// react-icons
 import {
   FaFacebook,
   FaTwitter,
@@ -21,47 +21,28 @@ gsap.registerPlugin(ScrollTrigger);
 
 const SOCIALS = ["IG", "X", "YT", "VIMEO"];
 
-const iconMap = {
-  ig: FaInstagram,
-  instagram: FaInstagram,
-  x: FaTwitter,
-  twitter: FaTwitter,
-  yt: FaYoutube,
-  youtube: FaYoutube,
-  vimeo: FaVimeo,
-  facebook: FaFacebook,
-  linkedin: FaLinkedin,
-  github: FaGithub,
-};
-
-// Google Maps helper
-const getEmbedUrl = (url) => {
-  if (!url) return null;
-
-  if (url.includes("<iframe")) {
-    const match = url.match(/src="([^"]+)"/);
-    if (match) return match[1];
-  }
-
-  if (url.includes("/maps/embed")) return url;
-
-  if (url.includes("google.com/maps/place/")) {
-    const placeName = url.split("/place/")[1].split("/")[0];
-    return `https://maps.google.com/maps?q=${placeName}&output=embed`;
-  }
-
-  return `https://maps.google.com/maps?q=${encodeURIComponent(url)}&output=embed`;
-};
-
 export const Footer = () => {
   const footerRef = useRef(null);
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const iconMap = {
+    ig: FaInstagram,
+    instagram: FaInstagram,
+    x: FaTwitter,
+    twitter: FaTwitter,
+    yt: FaYoutube,
+    youtube: FaYoutube,
+    vimeo: FaVimeo,
+    facebook: FaFacebook,
+    linkedin: FaLinkedin,
+    github: FaGithub,
+  };
 
   const { links } = useSocialLinks();
   const { settings } = useSettings();
 
   useGSAP(
     () => {
-      // logo animation
       gsap.fromTo(
         ".ft-logo",
         { opacity: 0, y: 50 },
@@ -73,8 +54,6 @@ export const Footer = () => {
           scrollTrigger: { trigger: footerRef.current, start: "top 88%" },
         },
       );
-
-      // fade animation
       gsap.fromTo(
         ".ft-fade",
         { opacity: 0, y: 16 },
@@ -91,6 +70,11 @@ export const Footer = () => {
     { scope: footerRef },
   );
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (email.trim()) setSubmitted(true);
+  };
+
   return (
     <footer
       ref={footerRef}
@@ -100,42 +84,32 @@ export const Footer = () => {
         borderTop: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <style>{`
-            @keyframes mapPinBounce {
-              0%, 100% {
-                transform: translate(-50%, -100%) translateY(0);
-              }
-              50% {
-                transform: translate(-50%, -100%) translateY(-12px);
-              }
-            }
-            @keyframes pinShadowScale {
-              0%, 100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-              }
-              50% {
-                transform: translate(-50%, -50%) scale(0.65);
-                opacity: 0.35;
-              }
-            }
-            .animate-map-pin {
-              animation: mapPinBounce 1.2s ease-in-out infinite;
-            }
-            .animate-pin-shadow {
-              animation: pinShadowScale 1.2s ease-in-out infinite;
-            }
-          `}</style>
-
       <div className="w-full max-w-screen-xl mx-auto px-6 sm:px-10 lg:px-16 py-16 lg:py-20 flex flex-col gap-12">
-        {/* TOP */}
+        {/* ── Top: Logo + Contact ── */}
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10">
-          {/* LOGO */}
+          {/* Logo block */}
           <div className="ft-logo" style={{ opacity: 0 }}>
-            <p className="text-[10px] tracking-[0.4em] text-white uppercase mb-3">
-              Est. 2025 — {settings?.contact_email || "Kathmandu Nepal"}
+            <p
+              className="
+                    text-[10px]
+                    tracking-[0.4em]
+                    text-white
+                    uppercase
+                    mb-3
+                  "
+              style={{
+                textShadow: `
+                      0 0 4px rgba(255,255,255,0.55),
+                      0 0 8px rgba(255,255,255,0.4),
+                      0 0 14px rgba(255,255,255,0.25)
+                    `,
+              }}
+            >
+              Est. 2025 —{" "}
+              {settings?.contact_email
+                ? settings.contact_email
+                : "Kathmandu Nepal"}
             </p>
-
             <h2
               className="font-cinematic text-white leading-none"
               style={{
@@ -145,7 +119,6 @@ export const Footer = () => {
             >
               MOONLIGHT
             </h2>
-
             <h2
               className="font-cinematic leading-none"
               style={{
@@ -158,7 +131,7 @@ export const Footer = () => {
             </h2>
           </div>
 
-          {/* CONTACT + MAP */}
+          {/* Contact + Map block */}
           <div
             className="ft-logo flex flex-col lg:items-end gap-4"
             style={{ opacity: 0 }}
@@ -166,121 +139,100 @@ export const Footer = () => {
             {settings?.contact_phone && (
               <a
                 href={`tel:${settings.contact_phone}`}
-                className="text-[11px] tracking-[0.2em] text-white"
+                className="
+                    text-[11px]
+                    tracking-[0.2em]
+                    text-white
+                    transition-all
+                    duration-300
+                  "
+                style={{
+                  textShadow: `
+                      0 0 4px rgba(255,255,255,0.6),
+                      0 0 8px rgba(255,255,255,0.5),
+                      0 0 14px rgba(255,255,255,0.35)
+                    `,
+                }}
               >
-                Contact: {settings.contact_phone}
+                <p>Contact:</p>
+                {settings.contact_phone}
               </a>
             )}
+            {/* Map */}
+            <div className="w-full lg:w-96">
+              <p
+                className="
+      text-[15px]
+      tracking-[0.2em]
+      text-white
+      transition-all
+      duration-300
+    "
+                style={{
+                  textShadow: `
+        0 0 4px rgba(255,255,255,0.6),
+        0 0 8px rgba(255,255,255,0.5),
+        0 0 14px rgba(255,255,255,0.35)
+      `,
+                }}
+              >
+                LOCATION:
+              </p>
 
-            {/* MAP */}
-            {/* MAP */}
-            {settings?.google_maps_link && (
-              <div className="w-full lg:w-72">
-                <p className="text-[10px] tracking-[0.4em] text-white/40 uppercase mb-2">
-                  Find Us
-                </p>
-
-                <div
-                  className="relative w-full overflow-hidden rounded-xl"
-                  style={{
-                    height: "200px",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                  }}
-                >
-                  <iframe
-                    src={getEmbedUrl(settings.google_maps_link)}
-                    width="100%"
-                    height="100%"
-                    loading="lazy"
-                    title="Company Location"
-                    className="transition-transform duration-700 group-hover:scale-105"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-
-                  {/* Ground container (stays in place, holds shadow & ripple) */}
-                  <div className="absolute left-1/2 top-1/2 z-20 pointer-events-none -translate-x-1/2 -translate-y-1/2 w-0 h-0">
-                    {/* Ripple (grounded) */}
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                      <div className="w-10 h-10 rounded-full bg-red-500/20 animate-ping" />
-                    </div>
-
-                    {/* Shadow (grounded, but scales/fades in place) */}
-                    <div
-                      className="pin-shadow absolute left-1/2 top-1/2 animate-pin-shadow"
-                      style={{
-                        width: "20px",
-                        height: "7px",
-                        background: "rgba(0,0,0,0.4)",
-                        borderRadius: "999px",
-                        filter: "blur(4px)",
-                      }}
-                    />
-
-                    {/* Bouncing Pin (translates up and down relative to center) */}
-                    <div className="absolute left-1/2 top-1/2 animate-map-pin">
-                      {/* Marker SVG */}
-                      <svg
-                        width="44"
-                        height="44"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="drop-shadow-xl"
-                      >
-                        <defs>
-                          <linearGradient
-                            id="pinGradient"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor="#ff5a5a" />
-                            <stop offset="100%" stopColor="#dc2626" />
-                          </linearGradient>
-                        </defs>
-
-                        <path
-                          d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z"
-                          fill="url(#pinGradient)"
-                        />
-
-                        <circle cx="12" cy="9" r="3.5" fill="white" />
-
-                        <circle cx="12" cy="9" r="1.6" fill="#dc2626" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+              <div className="relative w-full h-[150px]">
+                <Earth3D locationText={settings?.google_maps_link} />
               </div>
-            )}
+            </div>
           </div>
         </div>
 
-        {/* DIVIDER */}
+        {/* ── Divider ── */}
         <div
           className="ft-fade w-full h-px"
           style={{ background: "rgba(255,255,255,0.08)", opacity: 0 }}
         />
 
-        {/* BOTTOM */}
+        {/* ── Bottom row ── */}
         <div
           className="ft-fade flex flex-col sm:flex-row sm:items-center justify-between gap-6"
           style={{ opacity: 0 }}
         >
-          <p className="text-[11px] tracking-[0.2em] text-white uppercase">
+          {/* Copyright */}
+          <p
+            className="
+                    text-[11px]
+                    tracking-[0.2em]
+                    text-white
+                    uppercase
+                  "
+            style={{
+              textShadow: `
+                      0 0 4px rgba(255,255,255,0.5),
+                      0 0 8px rgba(255,255,255,0.35),
+                      0 0 14px rgba(255,255,255,0.2)
+                    `,
+            }}
+          >
             © {new Date().getFullYear()} Moonlight Motion Pictures
           </p>
 
-          {/* NEWS */}
+          {/* News & Blog Button */}
           <a
             href="/news"
-            className="px-6 py-3 border border-white/15 rounded-full text-[11px] tracking-[0.28em] uppercase text-white hover:bg-white hover:text-black transition-all duration-500"
+            className="group relative overflow-hidden rounded-full border border-white/15 bg-white/[0.03] px-6 py-3
+                  shadow-[rgba(0,0,0,0.35)_0px_20px_40px,rgba(0,0,0,0.25)_0px_15px_15px,0_0_60px_rgba(255,255,255,0.22),0_0_120px_rgba(255,255,255,0.10)]
+                  hover:shadow-[rgba(0,0,0,0.4)_0px_24px_48px,rgba(0,0,0,0.3)_0px_18px_18px,0_0_90px_rgba(255,255,255,0.35),0_0_160px_rgba(255,255,255,0.18)]
+                  transition-all duration-500 hover:border-white/30 hover:bg-white hover:text-black"
           >
-            News & Blog ↗
+            <span className="relative z-10 flex items-center gap-3 text-[11px] tracking-[0.28em] uppercase text-white group-hover:text-black transition-colors duration-300">
+              News & Blog
+              <span className="transition-transform duration-300 group-hover:translate-x-1">
+                ↗
+              </span>
+            </span>
           </a>
-
-          {/* SOCIALS */}
-          <div className="flex items-center gap-5">
+          {/* Socials */}
+          <div className="flex items-center gap-6">
             {links && links.length > 0
               ? links.map((s) => {
                   const Icon = iconMap[s.platform?.toLowerCase()];
@@ -291,9 +243,16 @@ export const Footer = () => {
                       href={s.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-white/60 hover:text-white transition"
+                      aria-label={s.platform}
+                      className="
+              text-white/60
+              hover:text-white
+              transition-all
+              duration-300
+              hover:scale-110
+            "
                     >
-                      {Icon ? <Icon size={18} /> : s.platform}
+                      {Icon ? <Icon size={32} /> : s.platform}
                     </a>
                   );
                 })
@@ -304,27 +263,32 @@ export const Footer = () => {
                     <a
                       key={s}
                       href="#"
-                      className="text-white/60 hover:text-white transition"
+                      className="
+              text-white/60
+              hover:text-white
+              transition-all
+              duration-300
+              hover:scale-110
+            "
                     >
-                      {Icon ? <Icon size={18} /> : s}
+                      {Icon ? <Icon size={32} /> : s}
                     </a>
                   );
                 })}
           </div>
         </div>
       </div>
-
-      {/* BOTTOM BAR */}
+      {/* Bottom Copyright Bar */}
       <div
         className="w-full border-t border-white/10"
         style={{ background: "#080808" }}
       >
-        <div className="max-w-screen-xl mx-auto px-6 sm:px-10 lg:px-16 py-4 flex justify-center">
+        <div className="max-w-screen-xl mx-auto px-6 sm:px-10 lg:px-16 py-4 flex items-center justify-center">
           <a
             href="https://yashastech.com.np"
             target="_blank"
             rel="noreferrer"
-            className="text-[11px] tracking-[0.25em] text-white/50 hover:text-white uppercase"
+            className="text-[11px] tracking-[0.25em] text-white/50 hover:text-white uppercase transition-colors duration-200"
           >
             yashastech.com.np ↗
           </a>

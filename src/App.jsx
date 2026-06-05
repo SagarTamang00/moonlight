@@ -48,6 +48,43 @@ gsap.registerPlugin(ScrollTrigger)
 
 function App() {
 
+  useEffect(() => {
+  // 1. Disable right-click
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+  // 2. Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+  document.addEventListener("keydown", (e) => {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && e.key === "I") ||
+      (e.ctrlKey && e.shiftKey && e.key === "J") ||
+      (e.ctrlKey && e.shiftKey && e.key === "C") ||
+      (e.ctrlKey && e.key === "u")
+    ) {
+      e.preventDefault();
+    }
+  });
+
+  // 3. Infinite debugger loop — freezes devtools Sources tab
+  const devtoolsBlock = setInterval(() => {
+    debugger;
+  }, 100);
+
+  // 4. Detect devtools open via window size and wipe page
+  const detectDevtools = setInterval(() => {
+    if (
+      window.outerWidth - window.innerWidth > 160 ||
+      window.outerHeight - window.innerHeight > 160
+    ) {
+      document.body.innerHTML = "<h1>Not Allowed</h1>";
+    }
+  }, 500);
+
+  return () => {
+    clearInterval(devtoolsBlock);
+    clearInterval(detectDevtools);
+  };
+}, []);
   const containerRef = useRef(null)
   const moonRef = useRef(null)
   const gapRef = useRef(null)

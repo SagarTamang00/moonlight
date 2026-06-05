@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -107,9 +107,17 @@ const MediaItemCard = ({ item, project, index }) => {
   );
 };
 
-const ProjectMediaCards = ({ project, startIndex }) => {
+const ProjectMediaCards = ({ project, startIndex, onMediaLoad }) => {
   const { media, loading } = useProjectMedia(project.id);
+
+  useEffect(() => {
+    if (!loading && media) {
+      onMediaLoad(project.id, media.length);
+    }
+  }, [loading, media, project.id, onMediaLoad]);
+
   if (loading || !media || media.length === 0) return null;
+
   return (
     <>
       {media.map((item, i) => (
@@ -132,6 +140,24 @@ export const MediaGallery = () => {
   const { projects } = useProjects();
 
   const allProjects = projects || [];
+
+  // Track how many media items each project has
+  const [mediaCounts, setMediaCounts] = useState({});
+
+  const handleMediaLoad = useCallback((projectId, count) => {
+    setMediaCounts((prev) => {
+      if (prev[projectId] === count) return prev; // no change, avoid re-render
+      return { ...prev, [projectId]: count };
+    });
+  }, []);
+
+  // Build cumulative start index map from mediaCounts
+  const startIndexMap = {};
+  let running = 0;
+  for (const project of allProjects) {
+    startIndexMap[project.id] = running;
+    running += mediaCounts[project.id] ?? 0;
+  }
 
   useGSAP(
     () => {
@@ -175,11 +201,8 @@ export const MediaGallery = () => {
       loopWidthRef.current = firstHalf.scrollWidth + gap;
     };
 
-    // Measure initially
     measureWidth();
 
-    // Use ResizeObserver to detect when the size of the first half container changes
-    // (e.g. when individual project media finishes loading and rendering)
     const resizeObserver = new ResizeObserver(() => {
       measureWidth();
     });
@@ -209,8 +232,6 @@ export const MediaGallery = () => {
       resizeObserver.disconnect();
     };
   }, [allProjects.length]);
-
-  let cardIndex = 0;
 
   return (
     <section
@@ -246,17 +267,14 @@ export const MediaGallery = () => {
           className="flex gap-4 sm:gap-6 overflow-x-auto px-6 sm:px-10 lg:px-16 pb-16 pt-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
         >
           <div ref={firstHalfRef} className="flex gap-4 sm:gap-6 shrink-0">
-            {allProjects.map((project, idx) => {
-              const ci = cardIndex;
-              cardIndex++;
-              return (
-                <ProjectMediaCards
-                  key={`first-${project.id}-${idx}`}
-                  project={project}
-                  startIndex={ci}
-                />
-              );
-            })}
+            {allProjects.map((project, idx) => (
+              <ProjectMediaCards
+                key={`first-${project.id}-${idx}`}
+                project={project}
+                startIndex={startIndexMap[project.id] ?? 0}
+                onMediaLoad={handleMediaLoad}
+              />
+            ))}
           </div>
 
           <div className="flex gap-4 sm:gap-6 shrink-0">
@@ -265,6 +283,7 @@ export const MediaGallery = () => {
                 key={`second-${project.id}-${idx}`}
                 project={project}
                 startIndex={0}
+                onMediaLoad={handleMediaLoad}
               />
             ))}
           </div>
